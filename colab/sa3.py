@@ -1,4 +1,4 @@
-"""Stable Audio 3 노트북(06, 07) 도우미.
+"""Stable Audio 3 노트북(06, 07, 08) 도우미.
 
 CTxAI Stable Audio 3 MLX 패키지의 ctxai_audio.py를 Colab용으로 옮긴 것이다.
 추론은 공식 저장소의 CPU 런타임(optimized/tflite, LiteRT)을 별도 프로세스로 실행한다.
@@ -24,14 +24,15 @@ import ctai
 SA3_URL = 'https://github.com/Stability-AI/stable-audio-3'
 SA3_COMMIT = '77e0398c26f7d22d801ec1bb036307e8b231f741'   # MLX 패키지와 같은 커밋
 SR = 44100
-MAX_SECONDS = {'medium': 380, 'sm-music': 120}
+MAX_SECONDS = {'medium': 380, 'sm-music': 120, 'sm-sfx': 120}
 CFG = dict(src=None, dit='medium', decoder='same-l', threads=2, out_root=None)
 _SHOW = ('step ', '[1/3]', '[2/3]', '[3/3]', 'downloading', 'done ', 'error', 'Error', 'Traceback')
 
 
 HF_REPO = 'stabilityai/stable-audio-3-optimized'
 HF_REVISION = '08b17423649b5714b22eab20f96bf00751f2358a'   # MLX 패키지와 같은 가중치 revision
-DIT_FILE = {'medium': 'tflite/sa3-m/dit_w8a8.tflite', 'sm-music': 'tflite/sa3-sm-music/dit_w8a8.tflite'}
+DIT_FILE = {'medium': 'tflite/sa3-m/dit_w8a8.tflite', 'sm-music': 'tflite/sa3-sm-music/dit_w8a8.tflite',
+            'sm-sfx': 'tflite/sa3-sm-sfx/dit_w8a8.tflite'}
 
 
 def _ensure_weights(encoder=False):

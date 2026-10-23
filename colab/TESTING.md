@@ -101,6 +101,6 @@ CTAI_SKIP_INSTALL=1 bash colab/run_local_tests.sh jupyter - 00_getting_started 0
 - 02·03의 손잡이 셀은 `ipywidgets.interact` 대신 `observe`를 쓴다. `interact`는 nbconvert 실행에서 멈춘다.
 - 03의 allin1 1.1.0은 NATTEN 0.17의 함수 4개(`natten1dqkrpb`, `natten1dav`, `natten2dqkrpb`, `natten2dav`)를 쓴다. NATTEN 0.17은 Python 3.12·CUDA용 휠만 있어 Colab(Python 3.13)과 맥에서 깔리지 않으므로, 같은 계산을 순수 PyTorch로 옮긴 `natten_torch.py`를 `natten`으로 등록한다. 맥에서 소스로 빌드한 NATTEN 0.17.5와 비교해 함수 단위 67가지 경우에서 최대 오차 1.9e-6, 60초 곡 전체 분석에서 비트·구간이 같고 확률 곡선 차이 1.8e-7이었다.
 - 03은 Demucs 분리를 노트북에서 직접 해서 allin1이 찾는 위치에 저장한다. allin1이 부르는 `demucs.separate`는 torchaudio로 wav를 저장하는데, torchaudio 2.9부터는 torchcodec이 필요하다.
-- 03은 torch와 numpy를 Colab 기본값 그대로 쓴다(2026-10 기준 Python 3.13, torch 2.11, numpy 2). madmom은 GitHub판을 numpy 2로 빌드한다.
+- 03은 torch와 numpy를 Colab 기본값 그대로 쓴다(2026-10 기준 Python 3.13, torch 2.11, numpy 2). madmom은 GitHub판을 numpy 2로 빌드한다. 2026-10-24 Colab에서 세션 재시작 없이 설치 약 2분, 60초 곡 분석 T4 12.3 s · CPU 170 s로 allin1 경로(구간 라벨 포함)를 확인했다. 맥(M3 Pro, MPS)에서는 15 s.
 - 05는 `TF_USE_LEGACY_KERAS=1`과 `tf-keras`로 ddsp 3.7을 최신 TensorFlow에서 돌린다.
 - 06·07은 Stable Audio 3의 CPU 런타임(LiteRT)을 쓴다. 공식 저장소 커밋 `77e0398`에 고정했다.

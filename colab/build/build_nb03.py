@@ -27,7 +27,7 @@ md(r"""
 | 입력 → 출력 | 오디오(wav) → `bpm`, `beats`(초), `downbeats`(초), `beat_positions`(마디 안 위치 1~4), `segments`(start, end, label) + 프레임별 확률 곡선(100 fps) |
 | 모델 | `harmonix-all` — 8-fold 앙상블(각 약 2.6 M 파라미터) + Demucs `htdemucs`(분리용) |
 | 논문 / 코드 | [arXiv:2307.16425](https://arxiv.org/abs/2307.16425) · [github.com/mir-aidj/all-in-one](https://github.com/mir-aidj/all-in-one) |
-| 예상 시간 (Colab T4) | 설치 ≈ 1~2분 (madmom 빌드) · 60 초 음악 분석 ≈ 30 초 |
+| 예상 시간 (Colab) | 설치 ≈ 2분 (madmom 빌드) · 60 초 음악 분석: T4 ≈ 15 초, CPU ≈ 3분 |
 | GPU | **T4 권장**, 없어도 됨. 이웃 어텐션은 NATTEN 대신 저장소의 `natten_torch.py`(순수 PyTorch)로 돌리므로 CPU·맥(MPS)에서도 allin1이 돕니다. 설치가 실패하면 **madmom 폴백**(비트·다운비트만, 구간 없음)으로 넘어감 |
 
 진행 순서: 준비 → 설치 → 음악 고르기 → 모델 불러오기 → 분석 → 구조 그림 보기·클릭 듣기 → 손잡이 돌려보기 → 저장

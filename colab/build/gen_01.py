@@ -10,11 +10,11 @@ cells = [
 - 논문: Kwon, Jeong & Nam, "Towards Efficient and Real-Time Piano Transcription Using Neural Autoregressive Models," IEEE/ACM TASLP 2024 · 코드: https://github.com/jdasam/online_amt"""),
 ("code", BOOTSTRAP),
 ("code", r'''#@title 설치
+%pip install -q -r {REQ}/01_online_amt.txt
 import subprocess, sys, os
-r = subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'librosa>=0.10', 'pretty_midi', 'mir_eval', 'soundfile', 'ipywidgets'], capture_output=True, text=True)
-print(r.stderr[-600:] if r.returncode else '')
-AMT_DIR = os.path.join(MODELS_DIR, 'online_amt')                   # 코드와 체크포인트를 모델 폴더 한 곳에
-ctai.git_checkout('https://github.com/jdasam/online_amt', AMT_DIR)
+AMT_DIR = os.path.join(CODE_DIR, 'online_amt')                     # 코드 (보통 모델 폴더 안)
+AMT_COMMIT = 'ad12550909a1d86f699097d11885f427054a5ac2'           # 저자 저장소의 커밋을 고정
+ctai.git_checkout('https://github.com/jdasam/online_amt', AMT_DIR, AMT_COMMIT)
 # 최신 librosa에 맞춘 2줄 패치
 p = os.path.join(AMT_DIR, 'autoregressive', 'mel.py'); s = open(p).read()
 s = s.replace('pad_center(fft_window, filter_length)', 'pad_center(fft_window, size=filter_length)')
@@ -25,9 +25,9 @@ import torch, librosa; print('설치 OK · torch', torch.__version__, '· libros
     DEFAULT_EXAMPLE="피아노 (Scarlatti K.455, MAESTRO)", EXAMPLE_PARAM='["피아노 (Scarlatti K.455, MAESTRO)"]', MAX_SECONDS=30, TARGET_SR=16000, MONO=True)),
 ("code", r'''#@title 모델 로드 (체크포인트 179 MB, 처음 한 번만 내려받음)
 import torch
-ckpt = str(ctai.fetch(['https://media.githubusercontent.com/media/jdasam/online_amt/master/model-180000.pt',
+ckpt = str(ctai.fetch(['https://media.githubusercontent.com/media/jdasam/online_amt/%s/model-180000.pt' % AMT_COMMIT,
                        'gdrive:12DnYJJ6YKpsoEkXI9fYUTTd4wOeY_rlB'],                  # 저자가 README에 올린 Google Drive 사본
-                      os.path.join(AMT_DIR, 'model-180000.pt'), size=178804960))
+                      os.path.join(MODELS_DIR, 'online_amt', 'model-180000.pt'), size=178804960))
 sys.path.insert(0, AMT_DIR); sys.path.insert(0, ASSET_DIR)
 from transcribe import load_model, OnlineTranscriber
 from run_piano_amt import RawStateTranscriber, run_online, states_to_notes, velocity_proxy_from_audio, FPS

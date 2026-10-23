@@ -25,7 +25,7 @@ def in_colab():
 def setup(keep_in_drive=False):
     """경로를 정하고 Hugging Face·PyTorch 캐시를 MODELS_DIR 안으로 돌린다.
 
-    반환: dict(REPO_DIR, AUDIO_DIR, ASSET_DIR, MODELS_DIR, OUT_DIR, IN_COLAB)
+    반환: dict(REPO_DIR, AUDIO_DIR, ASSET_DIR, MODELS_DIR, CODE_DIR, OUT_DIR, IN_COLAB)
     환경변수 CTAI_MODELS_DIR, CTAI_OUT_DIR가 있으면 그 경로를 쓴다 (서버 테스트용).
     """
     colab = in_colab()
@@ -46,8 +46,11 @@ def setup(keep_in_drive=False):
     os.environ['HF_HOME'] = str(models / 'huggingface')
     os.environ['TORCH_HOME'] = str(models / 'torch')
     os.environ.setdefault('HF_HUB_DISABLE_TELEMETRY', '1')
+    # 코드 저장소(git)는 Drive에 두면 느리고 링크가 깨지므로 Drive 모드에서는 /content/code에 둔다
+    code = Path('/content/code') if str(models).startswith('/content/drive') else models
+    code.mkdir(parents=True, exist_ok=True)
     paths = dict(REPO_DIR=str(repo), AUDIO_DIR=str(repo / 'colab' / 'audio'),
-                 ASSET_DIR=str(repo / 'colab' / 'assets'), MODELS_DIR=str(models),
+                 ASSET_DIR=str(repo / 'colab' / 'assets'), MODELS_DIR=str(models), CODE_DIR=str(code),
                  OUT_DIR=str(out), IN_COLAB=colab)
     print('모델 폴더:', models)
     print('결과 폴더:', out)

@@ -18,7 +18,7 @@ def pip(*args):
     if r.returncode: print('pip 경고:', r.stderr.strip().splitlines()[-1][:300])
     return r.returncode == 0
 tfv = '.'.join(md.version('tensorflow').split('.')[:2])          # Colab에 깔린 TensorFlow와 같은 minor 버전의 tf-keras
-pip('tf-keras==%s.*' % tfv, 'tensorflow-probability==0.25.0', 'gin-config==0.5.0', 'hmmlearn', 'mir_eval', 'note-seq', 'cloudml-hypertune', 'tensorflow-datasets', 'google-cloud-storage', 'pydub', 'resampy', 'ipywidgets')
+pip('-r', os.path.join(REQ, '05_ddsp.txt'), 'tf-keras==%s.*' % tfv)   # 패키지 목록은 requirements/05_ddsp.txt
 if not pip('--no-build-isolation', 'crepe==0.0.16'):                 # setup.py가 pkg_resources를 써서 격리 빌드를 끔
     pip('setuptools<81'); pip('--no-build-isolation', 'crepe==0.0.16')   # 최신 setuptools에는 pkg_resources가 없음 → 한 번 내려서 재시도
 pip('--no-deps', 'ddsp==3.7.0')                                     # 메타데이터가 TF<=2.11을 요구하지만 추론은 최신 TF에서도 됨

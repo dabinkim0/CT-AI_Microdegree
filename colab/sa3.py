@@ -29,13 +29,49 @@ CFG = dict(src=None, dit='medium', decoder='same-l', threads=2, out_root=None)
 _SHOW = ('step ', '[1/3]', '[2/3]', '[3/3]', 'downloading', 'done ', 'error', 'Error', 'Traceback')
 
 
+HF_REPO = 'stabilityai/stable-audio-3-optimized'
+HF_REVISION = '08b17423649b5714b22eab20f96bf00751f2358a'   # MLX 패키지와 같은 가중치 revision
+DIT_FILE = {'medium': 'tflite/sa3-m/dit_w8a8.tflite', 'sm-music': 'tflite/sa3-sm-music/dit_w8a8.tflite'}
+
+
+def _ensure_weights(encoder=False):
+    """필요한 가중치를 고정 revision으로 받아 공식 런타임이 찾는 위치에 연결한다.
+
+    공식 런타임도 없는 파일을 스스로 받지만 revision을 고정하지 않으므로 여기서 먼저 받는다.
+    """
+    from huggingface_hub import hf_hub_download
+    files = [DIT_FILE[CFG['dit']], 'tflite/t5gemma/encoder_fp16.tflite', f"tflite/{CFG['decoder']}/dec_w8a8.tflite"]
+    if encoder:   # 인페인팅·변형에서만 필요
+        files.append(f"tflite/{CFG['decoder']}/enc_w8a8.tflite")
+    for name in files:
+        target = CFG['src'] / 'models' / name
+        if target.exists():
+            continue
+        print('내려받는 중:', name)
+        cached = Path(hf_hub_download(HF_REPO, name, revision=HF_REVISION))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.is_symlink():
+            target.unlink()
+        try:
+            target.symlink_to(cached)
+        except OSError:
+            import shutil
+            shutil.copy2(cached, target)
+
+
 def prepare(models_dir, out_dir, dit='medium', decoder='same-l', threads=None):
-    """공식 코드를 models/stable-audio-3에 받고 실행 설정을 정한다."""
-    src = ctai.git_checkout(SA3_URL, Path(models_dir) / 'stable-audio-3', SA3_COMMIT,
+    """공식 코드를 받고, 가중치를 내려받고, 실행 설정을 정한다.
+
+    코드와 CPU 캐시(.xnnwc)는 링크를 만들어야 해서 Drive 모드에서는 /content/code에 둔다.
+    가중치 자체는 HF_HOME(= models/huggingface)에 있다.
+    """
+    code_root = Path('/content/code') if str(models_dir).startswith('/content/drive') else Path(models_dir)
+    src = ctai.git_checkout(SA3_URL, code_root / 'stable-audio-3', SA3_COMMIT,
                             sparse=['optimized/tflite'])
     CFG.update(src=src / 'optimized' / 'tflite', dit=dit, decoder=decoder,
                threads=threads or (len(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity') else os.cpu_count()) or 2,
                out_root=Path(out_dir) / 'stable_audio_3')
+    _ensure_weights()
     import importlib.metadata as md
     print('LiteRT %s · 모델 %s + %s · CPU 스레드 %d' % (md.version('ai-edge-litert'), dit, decoder, CFG['threads']))
 
@@ -349,6 +385,7 @@ def composite_region(reference, generated, output, start, end, crossfade=0.1):
 
 def inpaint(source, prompt, *, start, end, seed=43, steps=8, cfg=1.0,
             negative_prompt='', crossfade=0.1, max_seconds=None):
+    _ensure_weights(encoder=True)
     if not 0 <= start < end:
         raise ValueError('Require 0 <= start < end.')
     if end - start < 0.2:
@@ -372,6 +409,7 @@ def inpaint(source, prompt, *, start, end, seed=43, steps=8, cfg=1.0,
 
 
 def variation(source, prompt, *, noise_level=0.6, seed=44, steps=8, cfg=1.0, max_seconds=None):
+    _ensure_weights(encoder=True)
     directory = _job('variation')
     prepared = prepare_audio(source, directory / 'reference_44100.wav', max_seconds)
     return _infer(directory, prompt=prompt, seconds=round(sf.info(str(prepared)).duration, 3),

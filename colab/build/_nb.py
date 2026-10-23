@@ -22,9 +22,10 @@ if REPO is None:
     REPO = '/content/CT-AI_Microdegree'
     subprocess.run(['git', 'clone', '-q', '--depth', '1', 'https://github.com/dabinkim0/CT-AI_Microdegree', REPO], check=True)
 sys.path.insert(0, os.path.join(REPO, 'colab'))
+REQ = os.path.join(REPO, 'colab', 'requirements')   # 노트북별 pip 패키지 목록
 import ctai
 P = ctai.setup(keep_in_drive=KEEP_IN_DRIVE)
-AUDIO_DIR, ASSET_DIR, MODELS_DIR, OUT_DIR, IN_COLAB = P['AUDIO_DIR'], P['ASSET_DIR'], P['MODELS_DIR'], P['OUT_DIR'], P['IN_COLAB']
+AUDIO_DIR, ASSET_DIR, MODELS_DIR, CODE_DIR, OUT_DIR, IN_COLAB = P['AUDIO_DIR'], P['ASSET_DIR'], P['MODELS_DIR'], P['CODE_DIR'], P['OUT_DIR'], P['IN_COLAB']
 print('예시 음원:', sorted(os.path.basename(p) for p in glob.glob(os.path.join(AUDIO_DIR, '*.wav'))))
 '''
 

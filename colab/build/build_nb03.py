@@ -67,15 +67,15 @@ NATTEN_URL = "https://github.com/SHI-Labs/NATTEN/releases/download/v0.17.5/natte
 if os.environ.get("CTAI_SKIP_INSTALL") != "1":      # 로컬 테스트용 스위치 (Colab에서는 무시)
     TORCH_IDX = "https://download.pytorch.org/whl/cu126" if HAS_GPU else "https://download.pytorch.org/whl/cpu"
     %pip install -q "torch==2.6.0" "torchaudio==2.6.0" --index-url {TORCH_IDX}
-    %pip install -q "numpy==1.26.4" "cython<3.1" setuptools wheel
-    %pip install -q --no-build-isolation "git+https://github.com/CPJKU/madmom"
-    %pip install -q "allin1==1.1.0" soundfile ipywidgets yt-dlp
+    %pip install -q -r {REQ}/03_allin1_base.txt                  # numpy 1.x, cython (madmom 빌드용)
+    %pip install -q --no-build-isolation -r {REQ}/03_madmom.txt  # madmom을 GitHub에서 빌드
+    %pip install -q -r {REQ}/03_allin1.txt
     if HAS_GPU and PYTAG == "cp312":
         whl = ctai.fetch(NATTEN_URL, Path(MODELS_DIR) / "wheels" / NATTEN_WHL, size=475288189)   # 약 475 MB, 처음 한 번만
         %pip install -q {whl}
     else:
         print(f"GPU 없음 또는 Python {PYTAG} ≠ cp312 → NATTEN 휠 설치 생략 (madmom 폴백)")
-    %pip install -q "numpy==1.26.4"                  # 다른 패키지가 numpy를 올렸을 경우 다시 고정
+    %pip install -q "numpy==1.26.4"                  # NATTEN 설치가 numpy를 올렸을 경우 다시 고정
 
 import numpy, torch, madmom, librosa
 assert numpy.__version__.startswith("1."), f"numpy {numpy.__version__} 가 로드되어 있습니다. 런타임을 다시 시작한 뒤 이 셀을 다시 실행하세요."

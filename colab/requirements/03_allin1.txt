@@ -1,0 +1,6 @@
+# 03 allin1 3단계. NATTEN 휠은 GPU 런타임에서 노트북이 따로 받아 설치
+allin1==1.1.0
+numpy==1.26.4
+soundfile
+ipywidgets
+yt-dlp

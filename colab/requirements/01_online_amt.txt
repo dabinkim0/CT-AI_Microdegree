@@ -1,0 +1,6 @@
+# 01 Online AMT. Colab 기본 torch를 그대로 씀
+librosa>=0.10
+pretty_midi
+mir_eval
+soundfile
+ipywidgets

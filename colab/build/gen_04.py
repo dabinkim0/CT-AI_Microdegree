@@ -9,9 +9,7 @@ cells = [
 - 논문: https://arxiv.org/abs/2211.08553"""),
 ("code", BOOTSTRAP),
 ("code", r'''#@title 설치
-import subprocess, sys
-r = subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'demucs==4.0.1', 'soundfile', 'ipywidgets'], capture_output=True, text=True)
-print(r.stderr[-800:] if r.returncode else '')
+%pip install -q -r {REQ}/04_demucs.txt
 import demucs, torch; print('설치 OK · demucs', demucs.__version__, '· torch', torch.__version__, '· GPU:', torch.cuda.is_available())'''),
 ("code", AUDIO_PICK.format(EXAMPLES="{'밴드 (Let\\'s Go Fishin\\', 보컬+밴드)': 'band_lets_go_fishin_60s.wav', '재즈 (Vibe Ace)': 'jazz_vibe_ace_60s.wav'}",
     DEFAULT_EXAMPLE="밴드 (Let's Go Fishin', 보컬+밴드)", EXAMPLE_PARAM='["밴드 (Let\'s Go Fishin\', 보컬+밴드)", "재즈 (Vibe Ace)"]', MAX_SECONDS=60, TARGET_SR=44100, MONO=False)),

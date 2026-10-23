@@ -1,0 +1,12 @@
+# 05 DDSP. TensorFlow는 Colab 기본값. tf-keras(TF와 같은 버전), crepe, ddsp는 노트북이 따로 설치
+tensorflow-probability==0.25.0
+gin-config==0.5.0
+hmmlearn
+mir_eval
+note-seq
+cloudml-hypertune
+tensorflow-datasets
+google-cloud-storage
+pydub
+resampy
+ipywidgets

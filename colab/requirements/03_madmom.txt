@@ -1,0 +1,2 @@
+# 03 allin1 2단계. PyPI의 madmom은 깨져 있어 GitHub에서 빌드 (--no-build-isolation 필요)
+madmom @ git+https://github.com/CPJKU/madmom

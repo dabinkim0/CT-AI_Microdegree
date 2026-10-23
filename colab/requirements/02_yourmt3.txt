@@ -1,0 +1,14 @@
+# 02 YourMT3+. torch·numpy는 Colab 기본값을 그대로 씀
+transformers==4.45.1   # Space 고정 버전 (T5 내부 모듈을 직접 import)
+lightning>=2.2.1
+einops
+mido
+deprecated
+python-dotenv
+wandb
+librosa>=0.10
+soundfile
+huggingface_hub
+mir_eval
+ipywidgets
+yt-dlp

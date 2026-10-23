@@ -5,10 +5,7 @@ SA3_INTRO = """**Stable Audio 3 Medium** (Stability AI, 2026). 텍스트 인코�
 SA3_INSTALL = r'''#@title 설치와 모델 준비 (약 1분, 가중치는 처음 실행할 때 내려받음)
 #@markdown `medium`(1.4 B, 내려받기 약 3.2 GB + 첫 실행 때 만드는 CPU 캐시 약 2.3 GB)이 기본입니다. 느리면 `sm-music`(작은 음악 모델, 약 1.2 GB, 최대 120초)을 고르세요.
 MODEL = 'medium'  #@param ["medium", "sm-music"]
-import subprocess, sys
-r = subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'ai-edge-litert>=2.2.0', 'sentencepiece', 'soundfile',
-                    'huggingface_hub', 'librosa', 'scipy', 'matplotlib'], capture_output=True, text=True)
-print(r.stderr[-600:] if r.returncode else '')
+%pip install -q -r {REQ}/sa3.txt
 import sa3
 sa3.prepare(MODELS_DIR, OUT_DIR, dit=MODEL, decoder='same-l' if MODEL == 'medium' else 'same-s')
 print('설치 OK')'''

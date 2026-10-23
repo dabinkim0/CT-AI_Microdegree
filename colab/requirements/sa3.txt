@@ -1,0 +1,8 @@
+# 06·07 Stable Audio 3 (CPU 런타임 LiteRT)
+ai-edge-litert>=2.2.0
+sentencepiece
+soundfile
+huggingface_hub
+librosa
+scipy
+matplotlib

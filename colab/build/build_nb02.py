@@ -51,17 +51,8 @@ Colab 기본 환경(Python 3.12, 사전 설치된 torch·numpy)을 그대로 쓰
 code(r"""
 import os, sys, importlib
 
-PINS = [
-    "transformers==4.45.1",     # Space 고정 버전 (T5 내부 모듈을 직접 import). numpy/torch 는 Colab 기본값 그대로 사용
-    "lightning>=2.2.1",
-    "einops", "mido", "deprecated", "python-dotenv", "wandb",
-    "librosa>=0.10", "soundfile",
-    "huggingface_hub", "mir_eval",
-    "ipywidgets", "yt-dlp",
-]
-PIN_STR = " ".join(f'"{p}"' for p in PINS)
 if os.environ.get("CTAI_SKIP_INSTALL") != "1":      # 로컬 테스트용 스위치 (Colab에서는 무시)
-    %pip install -q {PIN_STR}
+    %pip install -q -r {REQ}/02_yourmt3.txt          # 목록: colab/requirements/02_yourmt3.txt
 
 import numpy, torch, torchaudio, transformers, lightning, librosa, mido, einops, huggingface_hub
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

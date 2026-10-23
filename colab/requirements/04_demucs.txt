@@ -1,0 +1,4 @@
+# 04 Demucs. torch는 Colab 기본값
+demucs==4.0.1
+soundfile
+ipywidgets

@@ -1,0 +1,8 @@
+models/
+outputs/
+__pycache__/
+.ipynb_checkpoints/
+*.part
+*.whl
+*.pt
+*.tflite

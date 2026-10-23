@@ -12,7 +12,9 @@ cells = [
 ("code", BOOTSTRAP.replace('KEEP_IN_DRIVE = False',
                             '#@markdown Mac CPU 2코어 실행 실측: 1초 미만.\nKEEP_IN_DRIVE = False')),
 ("code", r'''#@title 설치와 모델 준비
-#@markdown 기본 `sm-sfx`는 효과음용 작은 모델(최대 120초)입니다. 이전 06·07에서 `KEEP_IN_DRIVE`를 켰다면 여기서도 켜 같은 `models` 폴더를 사용하세요.
+#@markdown 이 셀을 실행하면 Small SFX 가중치가 `models` 폴더로 자동으로 내려받아집니다(처음부터 약 1.19 GB, 수 분). 가중치를 따로 설치하거나 로그인할 필요는 없습니다.
+#@markdown 앞 음악 실습(06·07)의 「0. 준비」에서 `KEEP_IN_DRIVE`를 켰다면 여기서도 똑같이 켜세요. Drive의 같은 `models` 폴더에서 이미 받은 T5Gemma 텍스트 인코더와, `sm-music`을 받았다면 SAME-S 디코더를 다시 받지 않습니다.
+#@markdown 새로 받는 양은 `medium`만 받았다면 약 629 MB, `sm-music`도 받았다면 약 539 MB입니다. 앞에서 `KEEP_IN_DRIVE`를 켜지 않았다면 노트북마다 Colab 런타임이 따로라 처음부터 받습니다.
 #@markdown Mac CPU 2코어 실측: 첫 다운로드 포함 약 235초, 로컬 캐시 재사용 약 1초.
 MODEL = 'sm-sfx'  #@param ["sm-sfx", "sm-music", "medium"]
 %pip install -q -r {REQ}/sa3.txt
@@ -49,11 +51,11 @@ sa3.compare_audio(cfg_clips, title=f'SFX CFG comparison | seed {SEED}', output_d
                   filename='cfg_comparison')'''),
 ("md", """## Negative prompt 비교
 
-같은 CFG 4에서 negative prompt가 **없는 결과**와 **있는 결과**를 비교합니다. `music, speech, reverb`는 억제하려는 소리의 예시입니다. **CFG 1에서는 negative prompt를 쓸 수 없습니다.** 이 셀은 **Mac CPU 2코어 실측 약 10~22초**입니다."""),
+같은 CFG 4에서 negative prompt가 **없는 결과**와 **있는 결과**를 비교합니다. `music, speech, long reverb, poor quality, distorted`는 억제하려는 소리·품질 특성의 예시입니다. **CFG 1에서는 negative prompt를 쓸 수 없습니다.** 이 셀은 **Mac CPU 2코어 실측 약 10~22초**입니다."""),
 ("code", r'''#@title 생성: negative prompt 없음과 있음 (CFG 4)
 #@markdown Mac CPU 2코어 실측: 약 10~22초(새 4초 WAV 하나와 비교 그림).
 from pathlib import Path
-NEGATIVE_PROMPT = 'music, speech, long reverb'  #@param {type:"string"}
+NEGATIVE_PROMPT = 'music, speech, long reverb, poor quality, distorted'  #@param {type:"string"}
 NEGATIVE_CFG = 4.0
 t0 = time.time()
 negative_clips = [('없음', cfg_clips[1][1])]

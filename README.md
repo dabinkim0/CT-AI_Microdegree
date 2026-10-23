@@ -9,6 +9,6 @@
 | `docs/slides_spec.md` | 슬라이드별 스펙(S1~S30). 제목·본문·시각자료 캡션·발표자 노트 |
 | `docs/slides_prompt.md` | Google Slides의 Claude 사이드 패널에 넣을 프롬프트. `slides_spec.md`와 함께 사용 |
 
-다루는 모델: online AMT, YourMT3+, allin1, Demucs, DDSP Tone Transfer, Stable Audio 3 Medium·Small Music·Small SFX.
+다루는 모델: online AMT, YourMT3+, allin1, Demucs, DDSP Tone Transfer, Stable Audio 3 Medium.
 
 모델 가중치와 상업 음원은 저장소에 넣지 않는다. 가중치는 원래 배포처에서 노트북이 직접 받고, 예시 음원은 CC 라이선스 곡만 쓴다.

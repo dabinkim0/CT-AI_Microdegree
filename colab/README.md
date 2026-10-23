@@ -12,7 +12,7 @@ KAIST CT×AI 콘텐츠 마이크로디그리 「뉴럴 네트워크 활용하기
 | 05 | [Tone Transfer (DDSP)](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/05_ddsp_tone_transfer.ipynb) | 단선율 오디오 → 악기 소리 | CPU 또는 T4 |
 | 06 | [Stable Audio 3 생성](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/06_stable_audio_3_generate.ipynb) | 텍스트 → 음악 (CFG 비교) | CPU |
 | 07 | [Stable Audio 3 인페인팅](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/07_stable_audio_3_inpaint.ipynb) | 음악 + 텍스트 → 구간만 바뀐 음악 | CPU |
-| 08 | [Stable Audio 3 효과음](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/08_stable_audio_3_sfx.ipynb) | 텍스트 → 효과음 (CFG·negative prompt·길이 비교) | CPU |
+| 08 | [Stable Audio 3 효과음](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/08_stable_audio_3_sfx.ipynb) | 텍스트 → 효과음 | CPU |
 
 ## 실행 방법
 
@@ -34,9 +34,9 @@ KAIST CT×AI 콘텐츠 마이크로디그리 「뉴럴 네트워크 활용하기
 | 04 | `torch/` htdemucs_6s | 약 50 MB | [facebookresearch/demucs](https://github.com/facebookresearch/demucs) |
 | 05 | `ddsp/` 악기 4종 | 약 230 MB | Google Magenta DDSP |
 | 06·07 | `stable-audio-3/` 코드와 CPU 캐시, `huggingface/` 가중치 | 약 3.2 GB + 캐시 2.3 GB | [Stability-AI/stable-audio-3](https://github.com/Stability-AI/stable-audio-3) |
-| 08 | `stable-audio-3/` 코드와 CPU 캐시, `huggingface/` Small SFX DiT + SAME-S 디코더 + T5Gemma | 처음 약 1.19 GB (06·07과 폴더 공유 시 기존 파일 재사용) | [Stability-AI/stable-audio-3](https://github.com/Stability-AI/stable-audio-3) · [HF optimized 가중치](https://huggingface.co/stabilityai/stable-audio-3-optimized) (Stability AI Community License) |
+| 08 | `huggingface/` Small SFX 가중치 | 약 1.19 GB | [Stability-AI/stable-audio-3](https://github.com/Stability-AI/stable-audio-3) |
 
-Stable Audio 3 가중치에는 Stability AI Community License가 적용된다. 함께 쓰는 T5Gemma 텍스트 인코더에는 Gemma Terms of Use가 별도로 적용된다. 상업적으로 이용하려면 각각의 조건을 확인한다.
+Stable Audio 3 가중치에는 Stability AI Community License가 적용된다. 상업적으로 이용하려면 라이선스 조건을 확인한다.
 
 ## 폴더 구성
 

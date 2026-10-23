@@ -4,6 +4,8 @@ channels: [conda-forge, nodefaults]
 dependencies:
   - python=3.12
   - pip
+  - git          # 01 코드 받기. 새 맥에는 Xcode CLT 없이는 git이 없다
+  - ffmpeg       # YouTube 입력 (yt-dlp가 wav로 바꿀 때)
   - pip:
     - --extra-index-url https://download.pytorch.org/whl/cpu
     - torch==2.6.0

@@ -57,6 +57,24 @@ def setup(keep_in_drive=False):
     return paths
 
 
+def upload(dest_dir='.'):
+    """오디오 파일 하나를 받아 경로를 돌려준다.
+
+    Colab에서는 파일 선택 창을 띄워 dest_dir에 저장하고, 로컬에서는 파일 경로를 입력받는다.
+    """
+    if in_colab():
+        from google.colab import files
+        up = files.upload()
+        name = next(iter(up))
+        dest = Path(dest_dir) / name
+        dest.write_bytes(up[name])
+        return dest.resolve()
+    path = Path(input('오디오 파일 경로: ').strip().strip('\'"')).expanduser()
+    if not path.is_file():
+        raise FileNotFoundError('파일이 없습니다: %s' % path)
+    return path.resolve()
+
+
 def _human(n):
     return '%.0f MB' % (n / 1e6) if n >= 1e6 else '%.0f KB' % (n / 1e3)
 

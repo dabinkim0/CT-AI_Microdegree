@@ -112,10 +112,7 @@ def fetch_example(name):
 if src_w.value == "example":
     src_path = fetch_example(ex_w.value)
 elif src_w.value == "upload":
-    from google.colab import files
-    up = files.upload()                          # 파일 선택 창
-    name = next(iter(up)); src_path = Path(WORK) / name
-    src_path.write_bytes(up[name])
+    src_path = ctai.upload(WORK)                 # Colab: 파일 선택 창 / 로컬: 파일 경로 입력
 else:
     assert url_w.value.strip(), "YouTube URL을 입력하세요"
     src_path = Path(WORK) / "youtube_audio.wav"

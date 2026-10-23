@@ -4,6 +4,7 @@ channels: [conda-forge, nodefaults]
 dependencies:
   - python=3.12
   - pip
+  - ffmpeg       # YouTube 입력 (yt-dlp가 wav로 바꿀 때)
   - pip:
     - --extra-index-url https://download.pytorch.org/whl/cpu
     - torch==2.6.0

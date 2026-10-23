@@ -49,8 +49,7 @@ def load_audio(path, sr=TARGET_SR, max_sec=MAX_SECONDS, mono={MONO}):
 if SOURCE == '예시':
     audio_path = os.path.join(AUDIO_DIR, EXAMPLES[EXAMPLE])
 elif SOURCE == '업로드':
-    from google.colab import files
-    up = files.upload(); audio_path = list(up.keys())[0]
+    audio_path = str(ctai.upload())   # Colab: 파일 선택 창 / 로컬: 파일 경로 입력
 else:
     # 수업 내 학습 목적으로만 사용하세요. 저작권이 있는 음원은 외부에 배포하지 않습니다.
     import subprocess

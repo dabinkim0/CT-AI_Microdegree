@@ -9,6 +9,9 @@ if [ ! -f "$DIR/$NAME.yml" ]; then
   echo "사용법: bash $0 <analysis|mt3|allin1|ddsp|sa3> [설치 경로]"; exit 1
 fi
 if [ -n "$2" ]; then WHERE=(-p "$2"); else WHERE=(-n "ctai-$NAME"); fi
+if [ "$NAME" = allin1 ] && [ "$(uname)" = Darwin ] && ! xcrun --find clang >/dev/null 2>&1; then
+  echo "madmom 빌드에 C 컴파일러가 필요합니다. 'xcode-select --install'로 Xcode 명령줄 도구를 설치한 뒤 다시 실행하세요."; exit 1
+fi
 conda env create "${WHERE[@]}" -f "$DIR/$NAME.yml"
 PIP=(conda run "${WHERE[@]}" --no-capture-output python -m pip install)
 case $NAME in

@@ -55,11 +55,11 @@ md(r"""
 마지막 줄에 `설치 OK`가 찍히면 됩니다. `ALLIN1_OK = False`로 나오면 아래 셀들은 자동으로 madmom 폴백으로 동작합니다.
 """)
 code(r"""
-import os, sys, subprocess
+import os, sys, subprocess, shutil
 from pathlib import Path
 
 
-HAS_GPU = subprocess.run(["nvidia-smi"], capture_output=True).returncode == 0
+HAS_GPU = shutil.which("nvidia-smi") is not None and subprocess.run(["nvidia-smi"], capture_output=True).returncode == 0   # macOS에는 nvidia-smi가 없음
 PYTAG = f"cp{sys.version_info.major}{sys.version_info.minor}"
 NATTEN_WHL = "natten-0.17.5+torch260cu126-cp312-cp312-linux_x86_64.whl"
 NATTEN_URL = "https://github.com/SHI-Labs/NATTEN/releases/download/v0.17.5/natten-0.17.5%2Btorch260cu126-cp312-cp312-linux_x86_64.whl"
@@ -74,7 +74,7 @@ if os.environ.get("CTAI_SKIP_INSTALL") != "1":      # 로컬 테스트용 스위
         whl = ctai.fetch(NATTEN_URL, Path(MODELS_DIR) / "wheels" / NATTEN_WHL, size=475288189)   # 약 475 MB, 처음 한 번만
         %pip install -q {whl}
     else:
-        print(f"GPU 없음 또는 Python {PYTAG} ≠ cp312 → NATTEN 휠 설치 생략 (madmom 폴백)")
+        print(("GPU 없음" if not HAS_GPU else f"Python {PYTAG} ≠ cp312") + " → NATTEN 휠 설치 생략 (madmom 폴백)")
     %pip install -q "numpy==1.26.4"                  # NATTEN 설치가 numpy를 올렸을 경우 다시 고정
 
 import numpy, torch, madmom, librosa
@@ -86,6 +86,8 @@ try:
     if os.environ.get("CTAI_FORCE_MADMOM") == "1":        # 로컬 테스트용: 폴백 경로 강제
         raise ImportError("CTAI_FORCE_MADMOM=1")
     import natten, natten.functional as NF
+    if not natten.__version__.startswith("0.17"):   # allin1이 의존성으로 까는 최신 NATTEN(0.21 등)은 아래 연결 함수가 없어 추론에서 실패
+        raise ImportError(f"natten {natten.__version__} (0.17.x 필요)")
     # allin1 1.1.0 은 NATTEN 0.17.1 의 옛 함수 이름을 import 함. 0.17.5 에서는 이름만 바뀌었으므로 같은 함수로 연결.
     if not hasattr(NF, "natten1dqkrpb"):
         NF.natten1dqkrpb = lambda q, k, rpb, ks, d: NF.na1d_qk(q, k, kernel_size=(ks,), dilation=(d,), rpb=rpb)
@@ -154,10 +156,7 @@ def fetch_example(name):
 if src_w.value == "example":
     src_path = fetch_example(ex_w.value)
 elif src_w.value == "upload":
-    from google.colab import files
-    up = files.upload()
-    name = next(iter(up)); src_path = Path(WORK) / name
-    src_path.write_bytes(up[name])
+    src_path = ctai.upload(WORK)                 # Colab: 파일 선택 창 / 로컬: 파일 경로 입력
 else:
     assert url_w.value.strip(), "YouTube URL을 입력하세요"
     src_path = Path(WORK) / "youtube_audio.wav"

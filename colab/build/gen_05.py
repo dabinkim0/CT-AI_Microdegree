@@ -73,8 +73,7 @@ elif SOURCE == '마이크 녹음':
     try: audio_path = record_mic(RECORD_SECONDS)
     except Exception as e: print('마이크 녹음은 Colab 브라우저에서만 됩니다 (%s). 예시 트럼펫으로 대신합니다.' % type(e).__name__); audio_path = os.path.join(AUDIO_DIR, 'trumpet_solo_5s.wav')
 elif SOURCE == '업로드':
-    from google.colab import files
-    up = files.upload(); audio_path = list(up.keys())[0]
+    audio_path = str(ctai.upload())   # Colab: 파일 선택 창 / 로컬: 파일 경로 입력
 else:
     audio_path = os.path.join(AUDIO_DIR, 'trumpet_solo_5s.wav')
 

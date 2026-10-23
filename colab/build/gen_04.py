@@ -5,19 +5,19 @@ cells = [
 **Hybrid Transformer Demucs** (Rouard, Massa & Défossez, ICASSP 2023). 파형과 스펙트로그램 두 갈래 U-Net 사이에 Transformer를 둔 스템 분리 모델. `htdemucs_6s`는 vocals · drums · bass · guitar · piano · other 6개로 나눕니다.
 
 - 입력 → 출력: 음악 오디오 → 6개의 오디오
-- 소요 시간: 설치 2분 + 60초 곡 분리 T4 약 20초 (CPU 약 2분)
+- 소요 시간: 설치 2분 + 60초 곡 분리 T4 약 20초 (CPU 약 2분, Apple Silicon 맥은 GPU(MPS)로 약 5초)
 - 논문: https://arxiv.org/abs/2211.08553"""),
 ("code", BOOTSTRAP),
 ("code", r'''#@title 설치
 %pip install -q -r {REQ}/04_demucs.txt
-import demucs, torch; print('설치 OK · demucs', demucs.__version__, '· torch', torch.__version__, '· GPU:', torch.cuda.is_available())'''),
+import demucs, torch; print('설치 OK · demucs', demucs.__version__, '· torch', torch.__version__, '· GPU:', torch.cuda.is_available() or torch.backends.mps.is_available())'''),
 ("code", AUDIO_PICK.format(EXAMPLES="{'밴드 (Let\\'s Go Fishin\\', 보컬+밴드)': 'band_lets_go_fishin_60s.wav', '재즈 (Vibe Ace)': 'jazz_vibe_ace_60s.wav'}",
     DEFAULT_EXAMPLE="밴드 (Let's Go Fishin', 보컬+밴드)", EXAMPLE_PARAM='["밴드 (Let\'s Go Fishin\', 보컬+밴드)", "재즈 (Vibe Ace)"]', MAX_SECONDS=60, TARGET_SR=44100, MONO=False)),
 ("code", r'''#@title 모델 로드
 from demucs.pretrained import get_model
 from demucs.apply import apply_model
 import torch
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'   # mps: Apple Silicon 맥의 GPU
 model = get_model('htdemucs_6s').to(device).eval()
 print('스템:', model.sources, '| 파라미터 수: %.1f M' % (sum(p.numel() for p in model.parameters()) / 1e6), '| device:', device)'''),
 ("code", r'''#@title 추론: 분리 실행

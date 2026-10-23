@@ -4,6 +4,7 @@ channels: [conda-forge, nodefaults]
 dependencies:
   - python=3.12
   - pip
+  - git          # Stable Audio 3 코드 받기. 새 맥에는 Xcode CLT 없이는 git이 없다
   - pip:
     - -r ../requirements/sa3.txt
     - ipywidgets

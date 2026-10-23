@@ -38,8 +38,7 @@ if SOURCE.startswith('피아노'):
 elif SOURCE.startswith('예시'):
     source = os.path.join(AUDIO_DIR, 'jazz_vibe_ace_60s.wav')
 else:
-    from google.colab import files
-    up = files.upload(); source = os.path.abspath(list(up.keys())[0])
+    source = str(ctai.upload())   # Colab: 파일 선택 창 / 로컬: 파일 경로 입력
 MAX_INPUT_SECONDS = 24   # CPU 시간을 아끼려고 앞 24초만 씀
 print('원본:', source)
 sa3.plot_audio(source, region=(START_SECONDS, END_SECONDS))

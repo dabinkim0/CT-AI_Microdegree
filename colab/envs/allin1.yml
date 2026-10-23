@@ -5,6 +5,8 @@ channels: [conda-forge, nodefaults]
 dependencies:
   - python=3.12
   - pip
+  - git          # madmom을 GitHub에서 받기 (빌드에는 C 컴파일러도 필요: macOS는 xcode-select --install)
+  - ffmpeg       # YouTube 입력 (yt-dlp가 wav로 바꿀 때)
   - pip:
     - --extra-index-url https://download.pytorch.org/whl/cpu
     - torch==2.6.0

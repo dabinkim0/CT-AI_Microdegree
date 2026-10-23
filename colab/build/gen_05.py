@@ -233,7 +233,7 @@ else:
     if 'example_input' in dir(): print('예시의 입력 (트럼펫)'); display(Audio(example_input, rate=TARGET_SR))
 for name, y in results.items():
     print(name); display(Audio(norm(y), rate=TARGET_SR))'''),
-("md", """## 해 보기
+("md", """## 직접 실행하기
 
 1. 아래 슬라이더로 **옥타브**와 **음량**을 바꿔 다시 변환해 보세요. 모델이 보는 것은 두 곡선뿐이므로, 곡선을 바꾸면 출력이 그대로 따라옵니다. (f0를 +1 옥타브 올리면 바이올린은 자연스럽지만 색소폰은? 학습 음역 밖의 f0에서는 어떤 소리가 나나요?)
 2. 목소리(마이크 녹음 또는 04의 보컬 스템)를 넣었을 때 **어느 악기가 가장 잘 어울리나요? 왜?** (힌트: 위 그래프에서 입력 평균 음높이와 악기 평균 음높이의 거리, 숨·자음 구간의 confidence, 비브라토의 깊이를 보세요.)

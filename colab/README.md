@@ -51,15 +51,6 @@ Stable Audio 3 가중치에는 Stability AI Community License가 적용된다. �
 
 예시 음원 외에 각 노트북의 오디오 준비 셀에서 파일 업로드 또는 YouTube 주소를 입력으로 쓸 수 있다. 저작권이 있는 음원은 수업 내 학습 목적으로만 사용하고 외부에 배포하지 않는다.
 
-## 문제 해결
-
-| 증상 | 조치 |
-|---|---|
-| 설치 셀 오류 | 런타임 → 세션 다시 시작 후 처음부터 다시 실행한다. |
-| 03에서 allin1 설치 실패 | madmom으로 자동 전환되어 비트·다운비트·BPM만 출력한다. |
-| 05에서 ddsp 설치 실패 | f0·음량 추출과 사전 렌더링 예시로 진행한다. 웹 데모: https://sites.research.google/tonetransfer |
-| 06·07 실행 시간이 김 | 설치 셀의 `MODEL`을 `sm-music`으로 바꾸거나 `SECONDS`를 줄인다. |
-
 ## 로컬 실행
 
 Colab 밖에서 실행할 때의 conda 환경 구성과 검증 방법은 [TESTING.md](TESTING.md)에 있다.

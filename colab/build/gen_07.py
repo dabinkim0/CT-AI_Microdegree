@@ -70,7 +70,7 @@ assert np.array_equal(reference[:a], result[:a])
 assert np.array_equal(reference[b:], result[b:])
 assert not np.array_equal(reference[a:b], result[a:b])
 print("PASS: 구간 밖 완전 보존, 구간 안 실제 변경.")'''),
-("md", """## 해 보기
+("md", """## 직접 실행하기
 
 1. **스타일 바꾸기**: `TARGET_STYLE`을 `drum_and_bass`로 바꾸고 원본 셀부터 다시 실행합니다. 스펙트로그램에서 리듬 밀도가 어떻게 달라지나요?
 2. **CFG 올리기**: `CFG = 6.0`이면 변화가 커지는 대신 음량과 왜곡도 커집니다. 플레이어의 RMS·Peak를 비교해 보세요.

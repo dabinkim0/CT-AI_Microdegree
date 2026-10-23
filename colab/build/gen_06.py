@@ -3,7 +3,7 @@ from _nb import *
 SA3_INTRO = """**Stable Audio 3 Medium** (Stability AI, 2026). 텍스트 인코더(T5Gemma)가 프롬프트를 숫자로 바꾸고, 확산 트랜스포머(DiT)가 노이즈를 8단계에 걸쳐 음악의 압축 표현(latent)으로 다듬은 뒤, 오디오 디코더(SAME-L)가 44.1 kHz 스테레오로 되돌립니다. 이 노트북은 공식 CPU 런타임(LiteRT)을 써서 **GPU와 로그인 없이** 돌아갑니다."""
 
 SA3_INSTALL = r'''#@title 설치와 모델 준비 (약 1분, 가중치는 처음 실행할 때 내려받음)
-#@markdown `medium`(1.4 B, 내려받기 약 3.2 GB + 첫 실행 때 만드는 CPU 캐시 약 2.3 GB)이 기본입니다. 느리면 `sm-music`(작은 음악 모델, 약 1.2 GB, 최대 120초)을 고르세요.
+#@markdown `medium`(1.4 B, 내려받기 약 3.2 GB + 첫 실행 때 만드는 CPU 캐시 약 2.3 GB)이 기본입니다. `sm-music`은 작은 음악 모델입니다(약 1.2 GB, 최대 120초).
 MODEL = 'medium'  #@param ["medium", "sm-music"]
 %pip install -q -r {REQ}/sa3.txt
 import sa3
@@ -46,7 +46,7 @@ print('\n총 %.0f s · 결과 폴더: %s' % (time.time() - t0, comparison_dir))'
 모든 결과를 같은 시간·주파수 축과 같은 dB 범위(-90 ~ -10 dB)로 그리고, 음량을 따로 맞추지 않습니다. 그래서 그림이 밝은 것은 음색 차이일 수도 있고 **음량이 커진 것**일 수도 있습니다. 플레이어 위의 RMS·Peak 숫자를 같이 보세요."""),
 ("code", r'''#@title 비교: 스펙트로그램과 플레이어 (PNG·HTML·JSON 저장)
 cfg_report = sa3.compare_audio(cfg_clips, title=f"CFG comparison | seed {SEED}", output_dir=comparison_dir, filename="cfg_comparison")'''),
-("md", """## 해 보기
+("md", """## 직접 실행하기
 
 1. **같은 구간만 확대**: 아래 셀의 `CROP_RANGE`로 모든 결과의 같은 구간을 나란히 듣습니다. CFG가 커질수록 어떤 소리가 커지거나 거칠어지나요?
 2. **프롬프트 한 구절만 바꾸기**: `75 BPM`을 `120 BPM`으로, `felt piano`를 `nylon guitar`로 바꾸고 다시 생성해 보세요. 모델이 숫자(BPM)를 실제로 따르나요?

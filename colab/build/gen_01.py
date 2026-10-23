@@ -65,7 +65,7 @@ synth = synth_notes([(n['onset'], n['offset'], n['pitch']) for n in notes], sr=s
 print('원음'); display(Audio(mono, rate=sr))
 print('채보 결과 (사인파)'); display(Audio(synth, rate=sr))
 print('원음(왼쪽) + 채보(오른쪽)'); display(Audio(np.stack([mono[:len(synth)], synth[:len(mono)]]), rate=sr))'''),
-("md", """## 해 보기
+("md", """## 직접 실행하기
 
 1. **지연을 귀로 듣기**: 아래 셀은 지연 보정을 뺀 결과(`notes_raw`)를 원음과 겹쳐 재생합니다. 0.2초 늦게 따라오는 것이 들리나요? 실시간 비주얼에서는 이 지연을 어떻게 다루면 좋을까요?
 2. **velocity와 offset**: 이 모델은 세기(velocity)를 출력하지 않아 음량으로 추정하고, 페달을 많이 쓰는 곡에서는 offset이 흔들립니다. 자기 피아노 음원을 올려 보고(`SOURCE='업로드'`), 어떤 음이 빠지거나 늘어지는지 찾아 보세요."""),

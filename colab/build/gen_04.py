@@ -41,7 +41,7 @@ axes[-1].set_xlabel('time (s)'); plt.tight_layout(); plt.show()
 print('원음'); display(Audio(wav.numpy(), rate=sr))
 for name, s in stems.items():
     print(name); display(Audio(s, rate=sr))'''),
-("md", """## 해 보기
+("md", """## 직접 실행하기
 
 1. 아래 슬라이더로 스템을 섞어 **리믹스**를 만들어 보세요. 보컬만 빼면 MR(반주)이 됩니다.
 2. 가장 분리가 **안 되는** 악기는 무엇인가요? (힌트: `other`와 `piano`를 혼자 들어 보기) 왜 그럴까요?"""),

@@ -1,0 +1,15 @@
+# 05 DDSP Tone Transfer. crepe와 ddsp는 setup.sh가 이어서 설치한다.
+name: ctai-ddsp
+channels: [conda-forge, nodefaults]
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - tensorflow==2.21.0
+    - tf-keras==2.21.0
+    - setuptools<81
+    - -r ../requirements/05_ddsp.txt
+    - librosa
+    - soundfile
+    - matplotlib
+    - jupyter

@@ -1,0 +1,13 @@
+# 02 YourMT3+
+name: ctai-mt3
+channels: [conda-forge, nodefaults]
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - --extra-index-url https://download.pytorch.org/whl/cpu
+    - torch==2.6.0
+    - torchaudio==2.6.0
+    - -r ../requirements/02_yourmt3.txt
+    - matplotlib
+    - jupyter

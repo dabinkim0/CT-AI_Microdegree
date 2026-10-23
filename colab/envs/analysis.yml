@@ -1,0 +1,14 @@
+# 00 시작하기, 01 Online AMT, 04 Demucs
+name: ctai-analysis
+channels: [conda-forge, nodefaults]
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - --extra-index-url https://download.pytorch.org/whl/cpu
+    - torch==2.6.0
+    - torchaudio==2.6.0
+    - -r ../requirements/01_online_amt.txt
+    - -r ../requirements/04_demucs.txt
+    - matplotlib
+    - jupyter

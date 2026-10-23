@@ -1,0 +1,10 @@
+# 06 Stable Audio 3 생성, 07 Stable Audio 3 인페인팅
+name: ctai-sa3
+channels: [conda-forge, nodefaults]
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - -r ../requirements/sa3.txt
+    - ipywidgets
+    - jupyter

@@ -1,0 +1,15 @@
+# 03 Allin1. madmom과 allin1은 setup.sh가 이어서 설치한다.
+# NATTEN은 CUDA용 휠만 있어 넣지 않았다. GPU가 없으면 노트북이 madmom으로 비트·다운비트만 낸다.
+name: ctai-allin1
+channels: [conda-forge, nodefaults]
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - --extra-index-url https://download.pytorch.org/whl/cpu
+    - torch==2.6.0
+    - torchaudio==2.6.0
+    - -r ../requirements/03_allin1_base.txt
+    - librosa>=0.10
+    - matplotlib
+    - jupyter

@@ -1,6 +1,6 @@
-# 실습 노트북 (Colab)
+# 실습 노트북
 
-KAIST CT×AI 콘텐츠 마이크로디그리 "뉴럴 네트워크 활용하기" 실습 자료. 아래 링크를 누르면 Colab에서 바로 열린다.
+KAIST CT×AI 콘텐츠 마이크로디그리 「뉴럴 네트워크 활용하기」의 실습 노트북이다. 표의 링크로 Google Colab에서 연다.
 
 | # | 노트북 | 입력 → 출력 | 런타임 |
 |---|---|---|---|
@@ -13,42 +13,53 @@ KAIST CT×AI 콘텐츠 마이크로디그리 "뉴럴 네트워크 활용하기" 
 | 06 | [Stable Audio 3 생성](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/06_stable_audio_3_generate.ipynb) | 텍스트 → 음악 (CFG 비교) | CPU |
 | 07 | [Stable Audio 3 인페인팅](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/07_stable_audio_3_inpaint.ipynb) | 음악 + 텍스트 → 구간만 바뀐 음악 | CPU |
 
-## 사용법
+## 실행 방법
 
-1. 링크로 노트북을 연다. GPU가 필요한 노트북은 런타임 → 런타임 유형 변경 → **T4 GPU**.
-2. 위에서부터 셀을 차례로 실행한다. 첫 셀 **0. 준비**가 이 저장소를 받고 모델 폴더를 만든다.
-3. 모델 가중치는 각 노트북이 처음 실행될 때 `models` 폴더 하나에 내려받는다. 따로 설치할 것은 없다.
+1. 표의 링크로 노트북을 연다. 런타임이 GPU인 노트북은 런타임 → 런타임 유형 변경에서 T4 GPU를 선택한다.
+2. 셀을 위에서부터 차례로 실행한다. 첫 셀 「0. 준비」가 이 저장소를 내려받고 모델 폴더를 만든다.
+3. 필요한 패키지와 모델 가중치는 각 노트북의 설치 셀이 처리한다.
 
-`models`의 기본 위치는 `/content/models`이고 런타임을 끄면 지워진다. 0. 준비 셀에서 `KEEP_IN_DRIVE`를 켜면 Google Drive의 `CT-AI_Microdegree/` 아래에 `models`와 `outputs`를 두어 다음에 다시 받지 않는다. 04의 보컬 스템을 05에서 쓰려면 두 노트북 모두 이 옵션을 켠다.
+## 저장 위치
 
-## models 폴더에 받는 것
+모델 가중치는 `models`, 결과 파일은 `outputs`에 저장한다. 기본 위치는 `/content`이며 런타임이 종료되면 삭제된다. 「0. 준비」 셀에서 `KEEP_IN_DRIVE`를 선택하면 Google Drive의 `CT-AI_Microdegree/` 아래에 저장되어 다음 실행 때 다시 내려받지 않는다. 04에서 분리한 보컬을 05에서 쓰려면 두 노트북 모두 이 옵션을 선택한다.
+
+## 모델 가중치
 
 | 노트북 | 하위 폴더 | 크기 | 출처 |
 |---|---|---|---|
 | 01 | `online_amt/` 코드와 체크포인트 | 약 180 MB | [jdasam/online_amt](https://github.com/jdasam/online_amt) (MIT) |
 | 02 | `YourMT3/` 코드와 체크포인트 | 약 540 MB | [HF Space mimbres/YourMT3](https://huggingface.co/spaces/mimbres/YourMT3) |
-| 03 | `huggingface/` allin1·Demucs, `wheels/` NATTEN (GPU일 때) | 약 90 MB + 475 MB | [mir-aidj/all-in-one](https://github.com/mir-aidj/all-in-one), [SHI-Labs/NATTEN](https://github.com/SHI-Labs/NATTEN) |
+| 03 | `huggingface/` allin1·Demucs, `wheels/` NATTEN (GPU 런타임) | 약 90 MB + 475 MB | [mir-aidj/all-in-one](https://github.com/mir-aidj/all-in-one), [SHI-Labs/NATTEN](https://github.com/SHI-Labs/NATTEN) |
 | 04 | `torch/` htdemucs_6s | 약 50 MB | [facebookresearch/demucs](https://github.com/facebookresearch/demucs) |
 | 05 | `ddsp/` 악기 4종 | 약 230 MB | Google Magenta DDSP |
 | 06·07 | `stable-audio-3/` 코드와 CPU 캐시, `huggingface/` 가중치 | 약 3.2 GB + 캐시 2.3 GB | [Stability-AI/stable-audio-3](https://github.com/Stability-AI/stable-audio-3) |
 
-Stable Audio 3 가중치는 Stability AI Community License를 따른다. 상업 서비스에 쓸 때는 라이선스를 확인한다.
+Stable Audio 3 가중치에는 Stability AI Community License가 적용된다. 상업적으로 이용하려면 라이선스 조건을 확인한다.
 
 ## 폴더 구성
 
-- `notebooks/` 노트북 00~07
-- `audio/` 예시 음원 4개와 출처 (`LICENSES.md`, 모두 CC 라이선스)
-- `assets/` online AMT 실행 코드, DDSP 미리 렌더한 예시 (설치가 안 될 때 듣기용)
-- `ctai.py` 0. 준비 셀과 내려받기 도우미, `sa3.py` Stable Audio 3 도우미
-- `build/` 노트북 생성 스크립트, `TESTING.md` 고치기와 검증 방법
+| 경로 | 내용 |
+|---|---|
+| `notebooks/` | 노트북 00~07 |
+| `audio/` | 예시 음원 4개와 출처 (`LICENSES.md`, 모두 CC 라이선스) |
+| `assets/` | Online AMT 실행 코드, DDSP 사전 렌더링 예시 |
+| `ctai.py`, `sa3.py` | 「0. 준비」 셀과 내려받기 함수, Stable Audio 3 실행 함수 |
+| `build/` | 노트북 생성 스크립트 |
+| `envs/` | 로컬 실행용 conda 환경 파일 |
 
-## 자기 음원 쓰기
+## 입력 음원
 
-각 노트북의 오디오 준비 셀에서 업로드나 YouTube를 고른다. 저작권이 있는 음원은 수업 안에서 학습 목적으로만 쓰고 외부에 배포하지 않는다.
+예시 음원 외에 각 노트북의 오디오 준비 셀에서 파일 업로드 또는 YouTube 주소를 입력으로 쓸 수 있다. 저작권이 있는 음원은 수업 내 학습 목적으로만 사용하고 외부에 배포하지 않는다.
 
-## 문제가 생기면
+## 문제 해결
 
-- 설치 셀 오류: 런타임 → 런타임 다시 시작 후 처음부터 다시 실행.
-- 03에서 NATTEN 설치가 안 되면 madmom 대체 경로(비트·다운비트·BPM만)로 자동 전환된다.
-- 05에서 ddsp 설치가 안 되면 f0·음량 추출과 미리 렌더한 예시로 진행하고, 웹 데모 https://sites.research.google/tonetransfer 를 쓴다.
-- 06·07이 느리면 설치 셀에서 `MODEL`을 `sm-music`으로 바꾸거나 `SECONDS`를 줄인다.
+| 증상 | 조치 |
+|---|---|
+| 설치 셀 오류 | 런타임 → 세션 다시 시작 후 처음부터 다시 실행한다. |
+| 03에서 NATTEN 설치 실패 | madmom으로 자동 전환되어 비트·다운비트·BPM만 출력한다. |
+| 05에서 ddsp 설치 실패 | f0·음량 추출과 사전 렌더링 예시로 진행한다. 웹 데모: https://sites.research.google/tonetransfer |
+| 06·07 실행 시간이 김 | 설치 셀의 `MODEL`을 `sm-music`으로 바꾸거나 `SECONDS`를 줄인다. |
+
+## 로컬 실행
+
+Colab 밖에서 실행할 때의 conda 환경 구성과 검증 방법은 [TESTING.md](TESTING.md)에 있다.

@@ -15,9 +15,10 @@ fi
 conda env create "${WHERE[@]}" -f "$DIR/$NAME.yml"
 PIP=(conda run "${WHERE[@]}" --no-capture-output python -m pip install)
 case $NAME in
-  allin1)  # madmom은 numpy·cython이 깔린 뒤 빌드 격리 없이 설치해야 한다
+  allin1)  # madmom은 numpy·cython이 깔린 뒤 빌드 격리 없이 설치해야 하고, allin1은 맥에서 NATTEN 빌드를 끌어오지 않도록 의존성 없이 깐다
     "${PIP[@]}" --no-build-isolation -r "$DIR/../requirements/03_madmom.txt"
-    "${PIP[@]}" -r "$DIR/../requirements/03_allin1.txt" ;;
+    "${PIP[@]}" -r "$DIR/../requirements/03_allin1.txt"
+    "${PIP[@]}" --no-deps allin1==1.1.0 ;;
   ddsp)    # crepe는 setup.py가 pkg_resources를 쓰고, ddsp 3.7은 메타데이터가 TF<=2.11을 요구한다
     "${PIP[@]}" --no-build-isolation crepe==0.0.16
     "${PIP[@]}" --no-deps ddsp==3.7.0 ;;

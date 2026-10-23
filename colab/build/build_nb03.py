@@ -27,8 +27,8 @@ md(r"""
 | 입력 → 출력 | 오디오(wav) → `bpm`, `beats`(초), `downbeats`(초), `beat_positions`(마디 안 위치 1~4), `segments`(start, end, label) + 프레임별 확률 곡선(100 fps) |
 | 모델 | `harmonix-all` — 8-fold 앙상블(각 약 2.6 M 파라미터) + Demucs `htdemucs`(분리용) |
 | 논문 / 코드 | [arXiv:2307.16425](https://arxiv.org/abs/2307.16425) · [github.com/mir-aidj/all-in-one](https://github.com/mir-aidj/all-in-one) |
-| 예상 시간 (Colab T4) | 설치 ≈ 4~5분 (torch 교체 + NATTEN 휠 + madmom 빌드) · 60 초 음악 분석 ≈ 30 초 |
-| GPU | **T4 권장**. NATTEN 사전 빌드 휠은 CUDA용만 있으므로 GPU가 없으면 아래 설치 셀이 자동으로 **madmom 폴백**(비트·다운비트만, 구간 없음)으로 넘어감. CPU 분석은 60 초 음악에 약 4분 |
+| 예상 시간 (Colab T4) | 설치 ≈ 1~2분 (madmom 빌드) · 60 초 음악 분석 ≈ 30 초 |
+| GPU | **T4 권장**, 없어도 됨. 이웃 어텐션은 NATTEN 대신 저장소의 `natten_torch.py`(순수 PyTorch)로 돌리므로 CPU·맥(MPS)에서도 allin1이 돕니다. 설치가 실패하면 **madmom 폴백**(비트·다운비트만, 구간 없음)으로 넘어감 |
 
 진행 순서: 준비 → 설치 → 음악 고르기 → 모델 불러오기 → 분석 → 구조 그림 보기·클릭 듣기 → 손잡이 돌려보기 → 저장
 """)
@@ -47,59 +47,36 @@ md(r"""
 
 이 모델은 설치가 까다로운 편이라 순서가 중요합니다.
 
-1. **torch 2.6.0** — NATTEN(이웃 어텐션 커널)의 사전 빌드 휠이 있는 가장 최신 torch. Colab 기본 torch를 교체합니다.
-2. **numpy < 2 + madmom** — madmom(비트 트래킹 후처리)은 PyPI 판이 깨져 있어 GitHub에서 직접 빌드.
-3. **allin1 1.1.0**
-4. **NATTEN 0.17.5** 휠 — SHI-Labs GitHub 릴리스에서 `models/wheels/`로 한 번만 내려받습니다(약 475 MB). GPU 런타임에서만 설치합니다.
+1. **madmom** — 비트 트래킹 후처리. PyPI 판이 깨져 있어 GitHub에서 직접 빌드합니다. torch와 numpy는 Colab 기본값을 그대로 씁니다.
+2. **allin1 1.1.0**과 Demucs 등 의존 패키지. allin1은 의존성 없이 깔아서, 맥에서 NATTEN 소스 빌드를 끌어오지 않게 합니다.
+3. **이웃 어텐션** — allin1은 NATTEN 0.17을 쓰는데, 이 버전은 Python 3.12·CUDA용 휠만 있습니다. 대신 같은 계산을 순수 PyTorch로 옮긴 `colab/natten_torch.py`를 `natten`으로 등록합니다(NATTEN 0.17.5와 결과가 같음을 확인).
 
 마지막 줄에 `설치 OK`가 찍히면 됩니다. `ALLIN1_OK = False`로 나오면 아래 셀들은 자동으로 madmom 폴백으로 동작합니다.
 """)
 code(r"""
-import os, sys, subprocess, shutil
+import os, sys
 from pathlib import Path
 
-
-HAS_GPU = shutil.which("nvidia-smi") is not None and subprocess.run(["nvidia-smi"], capture_output=True).returncode == 0   # macOS에는 nvidia-smi가 없음
-PYTAG = f"cp{sys.version_info.major}{sys.version_info.minor}"
-NATTEN_WHL = "natten-0.17.5+torch260cu126-cp312-cp312-linux_x86_64.whl"
-NATTEN_URL = "https://github.com/SHI-Labs/NATTEN/releases/download/v0.17.5/natten-0.17.5%2Btorch260cu126-cp312-cp312-linux_x86_64.whl"
-
 if os.environ.get("CTAI_SKIP_INSTALL") != "1":      # 로컬 테스트용 스위치 (Colab에서는 무시)
-    TORCH_IDX = "https://download.pytorch.org/whl/cu126" if HAS_GPU else "https://download.pytorch.org/whl/cpu"
-    %pip install -q "torch==2.6.0" "torchaudio==2.6.0" --index-url {TORCH_IDX}
-    %pip install -q -r {REQ}/03_allin1_base.txt                  # numpy 1.x, cython (madmom 빌드용)
+    %pip install -q -r {REQ}/03_allin1_base.txt                  # cython (madmom 빌드용)
     %pip install -q --no-build-isolation -r {REQ}/03_madmom.txt  # madmom을 GitHub에서 빌드
-    %pip install -q -r {REQ}/03_allin1.txt
-    if HAS_GPU and PYTAG == "cp312":
-        whl = ctai.fetch(NATTEN_URL, Path(MODELS_DIR) / "wheels" / NATTEN_WHL, size=475288189)   # 약 475 MB, 처음 한 번만
-        %pip install -q {whl}
-    else:
-        print(("GPU 없음" if not HAS_GPU else f"Python {PYTAG} ≠ cp312") + " → NATTEN 휠 설치 생략 (madmom 폴백)")
-    %pip install -q "numpy==1.26.4"                  # NATTEN 설치가 numpy를 올렸을 경우 다시 고정
+    %pip install -q -r {REQ}/03_allin1.txt                       # allin1이 쓰는 패키지 (Demucs 등)
+    %pip install -q --no-deps "allin1==1.1.0"                    # 맥에서 NATTEN 소스 빌드를 끌어오지 않도록 의존성 없이
 
 import numpy, torch, madmom, librosa
-assert numpy.__version__.startswith("1."), f"numpy {numpy.__version__} 가 로드되어 있습니다. 런타임을 다시 시작한 뒤 이 셀을 다시 실행하세요."
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+import natten_torch; natten_torch.use()             # NATTEN 0.17 대신 순수 PyTorch 이웃 어텐션 (colab/natten_torch.py)
+DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"   # mps: Apple Silicon 맥의 GPU
 
 ALLIN1_OK = False
 try:
     if os.environ.get("CTAI_FORCE_MADMOM") == "1":        # 로컬 테스트용: 폴백 경로 강제
         raise ImportError("CTAI_FORCE_MADMOM=1")
-    import natten, natten.functional as NF
-    if not natten.__version__.startswith("0.17"):   # allin1이 의존성으로 까는 최신 NATTEN(0.21 등)은 아래 연결 함수가 없어 추론에서 실패
-        raise ImportError(f"natten {natten.__version__} (0.17.x 필요)")
-    # allin1 1.1.0 은 NATTEN 0.17.1 의 옛 함수 이름을 import 함. 0.17.5 에서는 이름만 바뀌었으므로 같은 함수로 연결.
-    if not hasattr(NF, "natten1dqkrpb"):
-        NF.natten1dqkrpb = lambda q, k, rpb, ks, d: NF.na1d_qk(q, k, kernel_size=(ks,), dilation=(d,), rpb=rpb)
-        NF.natten1dav    = lambda a, v, ks, d: NF.na1d_av(a, v, kernel_size=(ks,), dilation=(d,))
-        NF.natten2dqkrpb = lambda q, k, rpb, ks, d: NF.na2d_qk(q, k, kernel_size=(ks, ks), dilation=(d, d), rpb=rpb)
-        NF.natten2dav    = lambda a, v, ks, d: NF.na2d_av(a, v, kernel_size=(ks, ks), dilation=(d, d))
     import allin1
     from allin1.models import load_pretrained_model
     ALLIN1_OK = True
-    print(f"natten {natten.__version__} / allin1 {allin1.__version__ if hasattr(allin1, '__version__') else '1.1.0'}")
+    print(f"allin1 1.1.0 / 이웃 어텐션: natten_torch (순수 PyTorch)")
 except Exception as e:
-    print("allin1/NATTEN 을 불러올 수 없습니다 →", repr(e)[:160])
+    print("allin1을 불러올 수 없습니다 →", repr(e)[:160])
     print("→ madmom 폴백(비트·다운비트·BPM만)으로 진행합니다.")
 
 print(f"python {sys.version.split()[0]} | torch {torch.__version__} | numpy {numpy.__version__} | madmom {madmom.__version__} | device {DEVICE} | ALLIN1_OK = {ALLIN1_OK}")
@@ -201,9 +178,8 @@ if ALLIN1_OK:
     n_params = sum(p.numel() for m in model.models for p in m.parameters())
     print(f"allin1 harmonix-all: {len(model.models)}-fold 앙상블, 총 {n_params/1e6:.1f} M 파라미터 (fold당 {n_params/len(model.models)/1e6:.2f} M)")
     from demucs.pretrained import get_model as _get_demucs
-    demucs_model = _get_demucs("htdemucs")
+    demucs_model = _get_demucs("htdemucs").to(DEVICE).eval()
     print(f"Demucs htdemucs: {sum(p.numel() for p in demucs_model.parameters())/1e6:.1f} M 파라미터 (분리용)")
-    del demucs_model
     METHOD = "allin1 harmonix-all"
 else:
     from madmom.features.downbeats import RNNDownBeatProcessor, DBNDownBeatTrackingProcessor
@@ -234,6 +210,17 @@ code(r"""
 FPS = 100
 t0 = time.time()
 if ALLIN1_OK:
+    # ① Demucs 분리를 여기서 직접 한다. allin1은 demucs.separate를 따로 실행하는데, 최신 torchaudio는 wav 저장에 torchcodec이 필요하다.
+    from demucs.apply import apply_model
+    x = torch.tensor(np.stack([y, y]), dtype=torch.float32)          # (2, T) 44.1 kHz
+    ref = x.mean(0); xn = (x - ref.mean()) / (ref.std() + 1e-8)
+    with torch.no_grad():
+        stems = apply_model(demucs_model, xn[None].to(DEVICE), device=DEVICE, shifts=1, split=True, overlap=0.25, progress=False)[0].cpu()
+    stems = stems * (ref.std() + 1e-8) + ref.mean()
+    stem_dir = Path(WORK) / "demix" / "htdemucs" / INPUT_WAV.stem     # allin1이 찾는 위치: 있으면 분리를 건너뜀
+    stem_dir.mkdir(parents=True, exist_ok=True)
+    for name, s in zip(demucs_model.sources, stems):
+        sf.write(stem_dir / f"{name}.wav", s.numpy().T, SR, subtype="PCM_16")
     r = allin1.analyze(str(INPUT_WAV), device=DEVICE, include_activations=True, overwrite=True,
                        demix_dir=f"{WORK}/demix", spec_dir=f"{WORK}/spec", multiprocess=False)
     result = dict(method=METHOD, bpm=int(r.bpm), beats=[float(b) for b in r.beats], downbeats=[float(b) for b in r.downbeats],

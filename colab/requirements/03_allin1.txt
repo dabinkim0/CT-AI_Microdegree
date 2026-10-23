@@ -1,6 +1,11 @@
-# 03 allin1 3단계. NATTEN 휠은 GPU 런타임에서 노트북이 따로 받아 설치
-allin1==1.1.0
-numpy==1.26.4
+# 03 allin1 3단계. allin1 1.1.0이 쓰는 패키지. allin1 자체는 노트북이 --no-deps로 따로 설치
+# (맥에서는 allin1이 NATTEN 소스 빌드를 끌어오므로). NATTEN 대신 colab/natten_torch.py를 쓴다
+demucs==4.0.1
+hydra-core
+omegaconf
+huggingface_hub
+librosa
+matplotlib
 soundfile
 ipywidgets
 yt-dlp

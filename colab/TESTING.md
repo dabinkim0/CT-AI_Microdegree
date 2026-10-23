@@ -8,7 +8,7 @@
 |---|---|---|
 | `ctai-analysis` | 00, 01, 04 | torch 2.6.0 (CPU), librosa, pretty_midi, demucs 4.0.1 |
 | `ctai-mt3` | 02 | torch 2.6.0 (CPU), transformers 4.45.1, lightning |
-| `ctai-allin1` | 03 | torch 2.6.0 (CPU), numpy 1.26.4, madmom (GitHub), allin1 1.1.0 |
+| `ctai-allin1` | 03 | torch 2.6.0 (CPU), madmom (GitHub), allin1 1.1.0 (NATTEN 대신 `natten_torch.py`) |
 | `ctai-ddsp` | 05 | tensorflow 2.21.0, tf-keras 2.21.0, ddsp 3.7.0, crepe 0.0.16 |
 | `ctai-sa3` | 06, 07 | ai-edge-litert, sentencepiece |
 
@@ -22,7 +22,7 @@ jupyter lab colab/notebooks
 ```
 
 - torch는 CPU 빌드이다. NVIDIA GPU에서 쓰려면 yml의 `--extra-index-url` 주소를 `https://download.pytorch.org/whl/cu126`으로 바꾼다.
-- 03은 GPU가 없으면 NATTEN 없이 madmom으로 비트·다운비트·BPM만 출력한다.
+- 03은 GPU가 없어도 allin1 경로로 구간 라벨까지 낸다. 이웃 어텐션은 `natten_torch.py`(순수 PyTorch)가 맡는다.
 - `git`(01·06·07의 코드 받기)과 `ffmpeg`(YouTube 입력)는 conda-forge에서 환경에 함께 깐다. 시스템에 없어도 된다.
 - Linux x86_64와 macOS arm64(Apple Silicon)에서 검증했다.
 
@@ -99,6 +99,8 @@ CTAI_SKIP_INSTALL=1 bash colab/run_local_tests.sh jupyter - 00_getting_started 0
 
 참고 사항
 - 02·03의 손잡이 셀은 `ipywidgets.interact` 대신 `observe`를 쓴다. `interact`는 nbconvert 실행에서 멈춘다.
-- 03의 allin1은 NATTEN 휠이 필요하고, 휠은 CUDA용만 있다. GPU가 없으면 madmom으로 비트·다운비트만 낸다. allin1이 의존성으로 최신 NATTEN(0.21 등)을 깔기 때문에, 노트북은 NATTEN 0.17.x일 때만 allin1 경로를 쓴다.
+- 03의 allin1 1.1.0은 NATTEN 0.17의 함수 4개(`natten1dqkrpb`, `natten1dav`, `natten2dqkrpb`, `natten2dav`)를 쓴다. NATTEN 0.17은 Python 3.12·CUDA용 휠만 있어 Colab(Python 3.13)과 맥에서 깔리지 않으므로, 같은 계산을 순수 PyTorch로 옮긴 `natten_torch.py`를 `natten`으로 등록한다. 맥에서 소스로 빌드한 NATTEN 0.17.5와 비교해 함수 단위 67가지 경우에서 최대 오차 1.9e-6, 60초 곡 전체 분석에서 비트·구간이 같고 확률 곡선 차이 1.8e-7이었다.
+- 03은 Demucs 분리를 노트북에서 직접 해서 allin1이 찾는 위치에 저장한다. allin1이 부르는 `demucs.separate`는 torchaudio로 wav를 저장하는데, torchaudio 2.9부터는 torchcodec이 필요하다.
+- 03은 torch와 numpy를 Colab 기본값 그대로 쓴다(2026-10 기준 Python 3.13, torch 2.11, numpy 2). madmom은 GitHub판을 numpy 2로 빌드한다.
 - 05는 `TF_USE_LEGACY_KERAS=1`과 `tf-keras`로 ddsp 3.7을 최신 TensorFlow에서 돌린다.
 - 06·07은 Stable Audio 3의 CPU 런타임(LiteRT)을 쓴다. 공식 저장소 커밋 `77e0398`에 고정했다.

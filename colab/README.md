@@ -7,7 +7,7 @@ KAIST CT×AI 콘텐츠 마이크로디그리 「뉴럴 네트워크 활용하기
 | 00 | [시작하기](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/00_getting_started.ipynb) | 오디오 보기·듣기 | CPU |
 | 01 | [Online AMT](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/01_online_amt_piano_transcription.ipynb) | 피아노 오디오 → MIDI (실시간) | CPU |
 | 02 | [YourMT3+](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/02_YourMT3plus_multi_instrument_transcription.ipynb) | 음악 오디오 → 멀티악기 MIDI | T4 GPU 권장 |
-| 03 | [allin1](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/03_allin1_beat_structure.ipynb) | 음악 오디오 → BPM · 비트 · 구간 | T4 GPU 필요 (없으면 비트만) |
+| 03 | [allin1](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/03_allin1_beat_structure.ipynb) | 음악 오디오 → BPM · 비트 · 구간 | T4 GPU 권장 (CPU도 가능) |
 | 04 | [Demucs](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/04_demucs_stem_separation.ipynb) | 음악 오디오 → 6 스템 | T4 GPU 권장 |
 | 05 | [Tone Transfer (DDSP)](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/05_ddsp_tone_transfer.ipynb) | 단선율 오디오 → 악기 소리 | CPU 또는 T4 |
 | 06 | [Stable Audio 3 생성](https://colab.research.google.com/github/dabinkim0/CT-AI_Microdegree/blob/main/colab/notebooks/06_stable_audio_3_generate.ipynb) | 텍스트 → 음악 (CFG 비교) | CPU |
@@ -29,7 +29,7 @@ KAIST CT×AI 콘텐츠 마이크로디그리 「뉴럴 네트워크 활용하기
 |---|---|---|---|
 | 01 | `online_amt/` 코드와 체크포인트 | 약 180 MB | [jdasam/online_amt](https://github.com/jdasam/online_amt) (MIT) |
 | 02 | `YourMT3/` 코드와 체크포인트 | 약 540 MB | [HF Space mimbres/YourMT3](https://huggingface.co/spaces/mimbres/YourMT3) |
-| 03 | `huggingface/` allin1·Demucs, `wheels/` NATTEN (GPU 런타임) | 약 90 MB + 475 MB | [mir-aidj/all-in-one](https://github.com/mir-aidj/all-in-one), [SHI-Labs/NATTEN](https://github.com/SHI-Labs/NATTEN) |
+| 03 | `huggingface/` allin1·Demucs | 약 90 MB | [mir-aidj/all-in-one](https://github.com/mir-aidj/all-in-one) |
 | 04 | `torch/` htdemucs_6s | 약 50 MB | [facebookresearch/demucs](https://github.com/facebookresearch/demucs) |
 | 05 | `ddsp/` 악기 4종 | 약 230 MB | Google Magenta DDSP |
 | 06·07 | `stable-audio-3/` 코드와 CPU 캐시, `huggingface/` 가중치 | 약 3.2 GB + 캐시 2.3 GB | [Stability-AI/stable-audio-3](https://github.com/Stability-AI/stable-audio-3) |
@@ -56,7 +56,7 @@ Stable Audio 3 가중치에는 Stability AI Community License가 적용된다. �
 | 증상 | 조치 |
 |---|---|
 | 설치 셀 오류 | 런타임 → 세션 다시 시작 후 처음부터 다시 실행한다. |
-| 03에서 NATTEN 설치 실패 | madmom으로 자동 전환되어 비트·다운비트·BPM만 출력한다. |
+| 03에서 allin1 설치 실패 | madmom으로 자동 전환되어 비트·다운비트·BPM만 출력한다. |
 | 05에서 ddsp 설치 실패 | f0·음량 추출과 사전 렌더링 예시로 진행한다. 웹 데모: https://sites.research.google/tonetransfer |
 | 06·07 실행 시간이 김 | 설치 셀의 `MODEL`을 `sm-music`으로 바꾸거나 `SECONDS`를 줄인다. |
 

@@ -1,6 +1,6 @@
 # 미디어 현업자를 위한 음악 딥러닝 입문 — 수업 계획서 (목요일 배경 / 토요일 실습)
 
-작성일: 2026-10-19 · 담당 분량: 하루 20~30분 × 2일 · 한 슬라이드 덱에 연속 배치 (목요일 S1~S16, 토요일 S17~S30)
+작성일: 2026-10-19 (토요일 부분 Colab 노트북 기준으로 수정 2026-10-23) · 담당 분량: 하루 20~30분 × 2일 · 한 슬라이드 덱에 연속 배치 (목요일 S1~S16, 토요일 S17~S30)
 
 ## 0. 한눈에 보기
 
@@ -8,11 +8,11 @@
 |---|---|
 | 대상 | 영상·방송·광고·공연 등 미디어 현업 숙련자. ML 비전공. 수식 없음. 각 모델의 입력·출력과 설정값 변경 효과 중심 |
 | 목요일 (25분) | 딥러닝 최소 개념 + 토요일에 다룰 7개 모델의 입력→출력·용도·설정값(하이퍼파라미터) 소개 |
-| 토요일 (28분) | Stable Audio 3 노트북 2개를 실제로 실행(생성·CFG 비교·인페인팅·변형) + 분석 모델 실행 결과를 코드로 열어보기 |
+| 토요일 (28분) | Colab 노트북 06·07(Stable Audio 3 생성·CFG 비교·인페인팅·변형)과 01(실시간 피아노 채보)을 실행 + 밴드 분석 결과를 코드로 열어보기 |
 | 다루는 모델 | 분석: online AMT(실시간 피아노 채보), 프레임 요약값, Demucs(스템 분리), YourMT3+(멀티악기 채보), allin1(비트·구조) · 생성: Tone Transfer(DDSP 음색 변환, 웹 데모), Stable Audio 3 Medium(텍스트→음악, 인페인팅, 오디오→오디오) |
 | 제외 | 리포트 2번 멜로디 추출(CHIME) — 수업에서 다루지 않음 |
-| 핵심 자료 | ① `docs/report_2026-10-06.html` (또는 standalone 버전) 브라우저로 열어 섹션 `#s1,#s3~#s7` 사용 ② https://magenta.withgoogle.com/tone-transfer (실제 앱은 sites.research.google/tonetransfer 로 연결) ③ `model.zip` → `model/notebooks/01_generate_music.ipynb`, `02_inpaint_music.ipynb` |
-| 실행 하드웨어 | 토요일 Stable Audio 3는 **Apple Silicon Mac에서만** 실행 (패키지가 MLX 기반. 검증 기기 M3 Pro 18 GB). 분석 모델은 연구실 Linux 서버 **CPU**로 사전 실행 + 피아노 채보 1개만 라이브. GPU는 사용하지 않음 |
+| 핵심 자료 | ① `docs/report_2026-10-06.html` (또는 standalone 버전) 브라우저로 열어 섹션 `#s1,#s3~#s7` 사용 ② https://magenta.withgoogle.com/tone-transfer (실제 앱은 sites.research.google/tonetransfer 로 연결) ③ 저장소 github.com/dabinkim0/CT-AI_Microdegree 의 `colab/notebooks/` — `06_stable_audio_3_generate.ipynb`, `07_stable_audio_3_inpaint.ipynb`, `01_online_amt_piano_transcription.ipynb` (Colab 링크는 `colab/README.md`) |
+| 실행 하드웨어 | 토요일 노트북 3개는 **Colab 기본 CPU 런타임(2코어)**에서 실행. Stable Audio 3는 공식 CPU 런타임(LiteRT)을 써서 GPU와 로그인 없이 돌아간다. 강사와 수강생이 같은 노트북을 쓴다. 밴드 분석(Demucs·YourMT3+·allin1)은 연구실 Linux 서버 **CPU**로 사전 실행한 결과를 연다. GPU는 사용하지 않음 |
 
 덱 전체 흐름: 소리를 숫자로 바꾼다 → 모델이 음표·비트·악기를 읽는다 → 글에서 소리를 만든다. 목요일은 그림으로, 토요일은 코드로.
 
@@ -61,7 +61,7 @@
 
 ### S5. 딥러닝 최소 개념 ③ — 소리를 숫자로: 파형 → 스펙트로그램 → 프레임
 - 핵심: 1초 = 44,100개 숫자(파형). 모델은 보통 이를 짧은 조각(프레임)마다 "어느 높이의 소리가 얼마나 있나"로 바꾼 그림(스펙트로그램)을 본다. 그래서 모델 출력도 **프레임 단위**(31 fps, 50 fps, 86 fps…)로 나온다.
-- 자료: 토요일 노트북이 그리는 멜 스펙트로그램 1장 (`model/reports/01_generate_music.executed.ipynb`의 `cfg_comparison.png` 중 하나 캡처). 가로 = 시간, 세로 = 높이, 색 = 세기.
+- 자료: 토요일 노트북이 그리는 멜 스펙트로그램 1장 (노트북 06이 저장하는 `cfg_comparison.png` 중 하나 캡처). 가로 = 시간, 세로 = 높이, 색 = 세기.
 - 메모: 리포트의 31.25 / 50 / 100 fps가 이 프레임 간격이다.
 
 ### S6. 오늘 다룰 모델 지도
@@ -70,13 +70,13 @@
 
 | 구분 | 모델 | 입력 → 출력 | 토요일 |
 |---|---|---|---|
-| 분석 | online AMT (피아노 채보) | 마이크/파형 32 ms 조각 → 음표 on/off (pitch, 시각) | 라이브 1회 |
+| 분석 | online AMT (피아노 채보) | 마이크/파형 32 ms 조각 → 음표 on/off (pitch, 시각) | 노트북 01 실행 |
 | 분석 | 프레임 요약값 | 음표 목록 → 밀도·평균 높이·onset 빈도 곡선 | 결과 열어보기 |
 | 분석 | Demucs | 믹스 wav → 6개 스템 wav (vocals/drums/bass/guitar/piano/other) | 사전 실행 결과 청취 |
 | 분석 | YourMT3+ | 믹스 wav → 악기 라벨 붙은 음표 목록(MIDI) | 결과 열어보기 |
 | 분석 | allin1 | 믹스 wav → BPM, 비트, 다운비트, 구간 라벨 | 결과 열어보기 |
 | 생성 | Tone Transfer (DDSP) | 흥얼거림 → 플루트/색소폰/트럼펫/바이올린 소리 | 웹 데모 (목요일 시연) |
-| 생성 | Stable Audio 3 Medium | 글(+기존 오디오, 구간) → 44.1 kHz 스테레오 음악 | 노트북 2개 실행 (핵심) |
+| 생성 | Stable Audio 3 Medium | 글(+기존 오디오, 구간) → 44.1 kHz 스테레오 음악 | 노트북 06·07 실행 (핵심) |
 
 ### S7. 실시간 피아노 채보 — online AMT (리포트 1번)
 - 핵심: 눌린 건반을 0.2초 뒤에 출력하는 모델. 정확도는 onset(시작)은 높고 offset(끝)은 페달 때문에 낮다 → 비주얼은 **시작 시점과 음높이**에 반응하게 설계.
@@ -111,7 +111,7 @@
 ### S13. 생성 ② — Stable Audio 3: 텍스트→음악
 - 핵심: 글(프롬프트)을 이해하는 언어 모델(T5Gemma) + 노이즈를 8단계에 걸쳐 음악의 압축 표현(latent)으로 다듬는 확산 모델(DiT) + 압축을 풀어 44.1 kHz 스테레오로 되돌리는 디코더(SAME). 세 구성요소의 가중치 합 6.9 GB.
 - 자료: 3상자 그림(텍스트 인코더 → 확산 트랜스포머 ×8 스텝 → 오디오 디코더). 세 가지 모드 표: 텍스트→오디오 / 오디오→오디오(변형) / 인페인팅(구간만 다시 만들기, 이어 붙이기 continuation).
-- 메모: Medium = 1.4 B 파라미터, 최대 380초. M3 Pro에서 30초 곡 약 10초(CFG 1). 라이선스: 코드 MIT, 가중치는 Stability AI Community License(상업 서비스 시 확인).
+- 메모: Medium = 1.4 B 파라미터, 최대 380초. M3 Pro에서 30초 곡 약 10초(CFG 1). 토요일 Colab CPU 2코어에서는 20초 곡 약 45초(CFG 1), 내려받기 약 3.2 GB. 라이선스: 코드 MIT, 가중치는 Stability AI Community License(상업 서비스 시 확인).
 
 ### S14. 토요일에 바꿀 설정값 6개 (Stable Audio 3)
 - 핵심: 각 설정값이 결과를 어떻게 바꾸는지 미리 정리.
@@ -120,20 +120,21 @@
 | 설정값 | 범위(기본) | 올리면 | 내리면 |
 |---|---|---|---|
 | `PROMPT` / `NEGATIVE_PROMPT` | 자유 문장 / 빈칸 | 악기·BPM·분위기·"no vocals"를 구체적으로 쓸수록 의도에 가까움 | 짧으면 모델이 임의로 채움 |
-| `CFG` (글을 따르는 세기) | 0~10 (생성 1, 인페인팅 4. 공식 문서는 강한 준수에 7 제안) | 글에 충실해지지만 **음량이 커지고 왜곡·클리핑** 증가(검증 기록: 인페인팅 CFG 4에서 RMS 0.11→0.50, 4.45 % 샘플 풀스케일) | 1이면 negative prompt 무시, 가장 부드럽고 빠름 |
+| `CFG` (글을 따르는 세기) | 0~10 (생성 비교 [1, 4], 인페인팅 4. 공식 문서는 강한 준수에 7 제안) | 글에 충실해지지만 **음량이 커지고 왜곡·클리핑** 증가(Mac 검증 기록: 인페인팅 CFG 4에서 RMS 0.11→0.50, 4.45 % 샘플 풀스케일). CPU에서 CFG>1은 약 1.5배 느림 | 1이면 negative prompt를 쓸 수 없음(노트북이 오류로 막음), 가장 부드럽고 빠름 |
 | `STEPS` | 1~32 (8) | 느려짐. 공식 문서: 8이 sweet spot, 그 이상은 품질이 꼭 좋아지지 않음 | 1이면 한 번의 forward(가장 빠름), 4 이하는 뭉개짐 |
 | `SEED` | 정수 (42) | 다른 곡 | 같은 seed + 같은 설정 = 같은 결과 |
-| `SECONDS` | 1~380 (30) | 길수록 시간·메모리 ↑ (30→60→120 순으로) | 짧게 시작 |
+| `SECONDS` | 1~380 (20) | 길수록 시간·메모리 ↑ (20→30→60 순으로) | 짧게 시작 |
 | 인페인팅 `START/END`, `CROSSFADE` | 0.2초 이상 / 0.1초 | 구간이 넓을수록 원곡 문맥 영향 ↓, 변화 큼 | 좁으면 원곡이 강하게 남음 |
-| 변형 `noise_level` | 0.01~1 (0.6) | 1에 가까울수록 원곡에서 멀어짐 | 0.3이면 원곡 골격 유지 |
+| 변형 `NOISE_LEVEL` | 0.1~1 (0.6) | 1에 가까울수록 원곡에서 멀어짐 | 0.3이면 원곡 골격 유지 |
 
 ### S15. 토요일 실습 내용
-- 핵심: ① 같은 글·같은 seed로 CFG 1/2/4/6 네 곡 만들어 듣고 비교 ② 피아노 24초 곡의 6~18초만 오케스트라로 바꾸기(나머지 샘플은 1비트도 안 바뀜을 코드로 확인) ③ 완성곡을 재즈 트리오로 변형 ④ 분석 모델 결과 JSON을 파이썬으로 열어 비주얼용 값 추출.
+- 핵심: ① 같은 글·같은 seed로 CFG 1과 4 두 곡 만들어 듣고 비교 ② 피아노 24초 곡의 6~18초만 오케스트라로 바꾸기(나머지 샘플은 1비트도 안 바뀜을 코드로 확인) ③ 같은 피아노 곡 전체를 재즈 트리오로 변형 ④ 피아노 채보를 돌려 지연 보정 전후 비교 + 밴드 분석 결과 JSON에서 비주얼용 값 추출.
 - 자료: 토요일 산출물 예시 — `inpaint_full_comparison.png`(편집 경계 청록 점선) 1장.
 
 ### S16. 준비물 (수강생)
-- 핵심: 노트북(아무 OS), 헤드폰, 본인이 바꿔보고 싶은 **30초 이내 음원 1개**(wav/mp3). Apple Silicon Mac이면 강사 배포 ZIP 설치 가능(15 GB 여유, 인터넷). 그 외는 강사 화면 + 공개 웹 데모(HF Space `stabilityai/stable-audio-3`)로 참여.
-- 메모: 설치는 선택. 토요일 목표는 강사 Mac 화면을 보며 설정값 변화를 듣는 것.
+- 핵심: 노트북(아무 OS, 브라우저), 헤드폰, Google 계정(Colab), 본인이 바꿔보고 싶은 **30초 이내 음원 1개**(wav/mp3). 설치할 것은 없다.
+- 수업 전 할 일: `colab/README.md`의 링크로 06·07·01을 한 번씩 열어 끝까지 실행. 첫 셀 **0. 준비**에서 `KEEP_IN_DRIVE`를 켜면 가중치가 Google Drive에 남아 수업 때 다시 받지 않는다(Drive 여유 6 GB 이상).
+- 메모: 사전 실행을 못 했으면 수업 중 06·07 각각 처음 내려받기 2~3분이 든다. Colab을 못 쓰면 강사 화면 + 공개 웹 데모(HF Space `stabilityai/stable-audio-3`)로 참여.
 
 ---
 
@@ -143,12 +144,11 @@
 - 한 줄: 피아노 소리를 32 ms마다 듣고 88건반 각각의 상태(off/offset/sustain/onset/re-onset)를 내는 인과(과거만 보는) 모델. PARpiano의 전신 online_amt(ISMIR 2020), 13.4 M 파라미터.
 - 입력 → 출력: 16 kHz 모노 파형 512샘플 조각 → 프레임마다 88×5 상태 → 음표 이벤트 `{onset, offset, pitch, velocity(RMS 추정)}` + 피아노롤.
 - 현업 쓸모: 라이브 공연 비주얼 트리거, 연주 연습 피드백, 악보 초안. CPU 노트북으로 실시간 가능(4스레드 4배속).
-- 토요일 설정값과 효과:
-  - `--threads 1→4`: 속도 2.0배→4.1배. 정확도 불변. 실시간 여유가 달라짐.
-  - `--mode online|offline`: offline은 앞뒤 문맥을 다 보는 대신 실시간 불가. F1 차이 0.2점 이내.
-  - `--no-delay-compensation`: 160 ms 보정을 끄면 onset F1 0.99→0.27. 지연 보정의 필요성을 보여주는 데모.
-  - `--silence_threshold 0.05 / --silence_patience 100`: 무음 게이트. 낮추면 여린 음을 잡지만 소음도 잡음.
-  - 곡 선택: 스카를라티(페달 적음) vs 리스트(페달 많음)의 offset F1 0.93 vs 0.02.
+- 토요일 설정값과 효과 (노트북 01):
+  - 「추론」 셀의 `torch.set_num_threads(2)`: Colab 2코어 기준. 서버 실측으로는 1→4스레드에서 속도 2.0배→4.1배, 정확도 불변. 실시간 여유가 달라짐.
+  - `DELAY = 0.16` 지연 보정: 「정답과 비교」 셀에서 보정 전 onset F1 0.28, 보정 후 0.99 (스카를라티 30초, 50 ms 허용). 「지연 보정 전/후 비교 재생」 셀로 귀로도 확인. 지연 보정의 필요성을 보여주는 데모.
+  - 입력: 예시(스카를라티 K.455 30초, 정답 MIDI 포함) 또는 업로드. 정답이 없으면 F1 대신 피아노롤과 합성음으로 확인.
+- 서버 명령줄(`run_piano_amt.py`)에만 있는 설정: `--mode online|offline`(offline은 앞뒤 문맥을 다 보는 대신 실시간 불가, F1 차이 0.2점 이내), `--silence_threshold 0.05 / --silence_patience 100`(무음 게이트. 낮추면 여린 음을 잡지만 소음도 잡음). 곡 선택: 스카를라티(페달 적음) vs 리스트(페달 많음)의 offset F1 0.93 vs 0.02 (리포트 수치).
 
 ### 3-2. 프레임 요약값 (리포트 3번, `piano/tools/frame_summary.py`)
 - 한 줄: 음표 목록을 31.25 fps 곡선 5개(`density, mean_pitch, pitch_spread, onset_rate_1s, active_pitches`)로 요약.
@@ -186,90 +186,90 @@
 - 현업 쓸모: 가이드 멜로디를 악기로 바꿔 데모 제작, 효과음 스케치.
 - 설정값과 효과: 악기 선택(음역이 맞는 악기가 자연스러움), **Octave**(목소리→바이올린은 +1이 보통 자연스러움), **Loudness**(낮추면 숨소리성 노이즈 감소), **Mix**(원음 비율). 다성(화음) 입력은 처리 불가. 단선율만.
 
-### 3-7. Stable Audio 3 Medium (MLX) — 생성·편집 (토요일 핵심, `model/notebooks/*`)
+### 3-7. Stable Audio 3 Medium (CPU, LiteRT) — 생성·편집 (토요일 핵심, 노트북 06·07, `colab/sa3.py`)
 - 한 줄: 텍스트 조건 잠재 확산 모델. 8스텝 증류, 44.1 kHz 스테레오, 1~380초.
 - 입력 → 출력: ① 프롬프트 → wav ② 프롬프트 + 기존 wav + `noise_level` → 변형 wav ③ 프롬프트 + 기존 wav + 구간 → 구간만 새로 만든 wav(구간 밖은 PCM 샘플 단위 보존, 안쪽 0.1초 크로스페이드).
 - 현업 쓸모: BGM 시안 다량 생성, 기존 BGM의 특정 구간만 분위기 교체(컷 길이 맞추기), 곡 연장(continuation), 레퍼런스 곡의 스타일 변형.
-- 설정값(위 S14 표) + 패키지 제약: Mac 전용(MLX), 추론마다 별도 프로세스(Metal 메모리 반환), 실행마다 `outputs/<시각>_<모드>_<id>/`에 `run.json`(프롬프트·시드·명령·시간), `inference.log`, wav, 비교 PNG/HTML/JSON 저장. 실행 기록이 자동으로 남는다.
+- 설정값(위 S14 표) + 실행 환경: 공식 CPU 런타임(LiteRT, 공식 저장소 커밋 `77e0398` 고정). Colab CPU 2코어에서 20초 곡 약 45초(CFG 1), 약 65초(CFG>1). 느리면 설치 셀에서 `MODEL='sm-music'`(약 1.2 GB, 최대 120초). 추론마다 별도 프로세스, 실행마다 `outputs/stable_audio_3/<시각>_<모드>_<id>/`에 `run.json`(프롬프트·시드·명령·시간), `inference.log`, wav, 비교 PNG/HTML/JSON 저장. 실행 기록이 자동으로 남는다.
 
 ---
 
 ## 4. 토요일 — 타임라인 (합계 28분, 버퍼 포함 30분)
 
+셀 이름은 각 노트북의 셀 제목(`#@title`) 앞부분이다.
+
 | 시각 | 길이 | 블록 | 슬라이드 | 실행 |
 |---|---|---|---|---|
-| 0:00 | 2분 | 복습 1장 + 환경 점검 | S17~S18 | NB01 셀1 `doctor()` |
-| 2:00 | 7분 | 실습 A: 텍스트→음악, CFG 1/2/4/6 비교 | S19~S21 | NB01 셀3·4·6 (+8) |
-| 9:00 | 8분 | 실습 B: 인페인팅 — 피아노 6~18초를 오케스트라로 | S22~S24 | NB02 셀3·4·6·8·10·12 |
-| 17:00 | 3분 | 실습 C: 오디오→오디오 변형 + 수강생 음원 1개 | S25 | NB01 셀10 / NB02 셀3 `SOURCE_PATH` |
-| 20:00 | 6분 | 실습 D: 분석 모델 결과를 코드로 열기 (피아노 채보 라이브 1회 + JSON 읽기) | S26~S28 | 서버 터미널 + 짧은 파이썬 |
+| 0:00 | 2분 | 복습 1장 + 환경 준비 | S17~S18 | 06·07·01을 탭 3개로 열고 각각 「0. 준비」 → 「설치와 모델 준비」(01은 「설치」) |
+| 2:00 | 7분 | 실습 A: 텍스트→음악, CFG 1과 4 비교 | S19~S21 | 06 「프롬프트와 설정」 → 「생성: CFG 값마다 한 곡씩 차례로」 → 「비교: 스펙트로그램과 플레이어」 (+「같은 구간 확대 비교」) |
+| 9:00 | 8분 | 실습 B: 인페인팅 — 피아노 6~18초를 오케스트라로 | S22~S24 | 07 「원본과 목표 스타일」 → 「인페인팅 실행」 → 「전체 곡 비교」·「편집 구간만 확대 비교」 → 「검증」 |
+| 17:00 | 3분 | 실습 C: 오디오→오디오 변형 + 수강생 음원 1개 | S25 | 07 「오디오 → 오디오 변형 (곡 전체)」 / 「원본과 목표 스타일」 `SOURCE='업로드'` |
+| 20:00 | 6분 | 실습 D: 피아노 채보 실행(지연 보정 전후) + 밴드 분석 JSON 읽기 | S26~S28 | 01 「모델 로드」 → 「추론」 → 「정답과 비교」 → 「지연 보정 전/후 비교 재생」 / 강사 화면에서 짧은 파이썬 |
 | 26:00 | 2분 | 정리: 설정값 요약, 이후 과제 | S29~S30 | — |
 | 28:00 | 2분 | 버퍼 | — | — |
 
-시간이 모자라면 자르는 순서: 실습 C → 실습 D의 라이브 채보(사전 실행 PNG로 대체) → 실습 A의 CFG 4개를 2개(1, 4)로.
+시간이 모자라면 자르는 순서: 실습 C → 실습 D의 밴드 JSON(사전 캡처로 대체) → 실습 A의 「같은 구간 확대 비교」.
 
 ## 5. 토요일 — 슬라이드별 개요 + 실행 셀 목록
 
-추론 시간은 `model/reports/VALIDATION.md`의 M3 Pro 18 GB 실측(2026-10-16)이다. 다른 Mac에서는 리허설로 다시 잰다.
+추론 시간은 CPU 2코어 기준(노트북 안내 문구와 같은 값)이다. 처음 실행하는 노트북은 가중치 내려받기 2~3분이 더 든다. 리허설 때 Colab에서 다시 잰다.
 
 ### S17. 복습
-- 핵심: S6 표를 다시 띄우고 오늘 실행할 항목에 표시. 분석은 결과 파일을 읽고, 생성은 직접 실행한다.
+- 핵심: S6 표를 다시 띄우고 오늘 실행할 항목에 표시. Stable Audio 3와 피아노 채보는 직접 실행하고, 밴드 분석은 결과 파일을 읽는다.
 
-### S18. 환경 점검 — 노트북 첫 셀
-- 핵심: 노트북은 환경 확인 셀부터. 가중치 4개 SHA256·소스 커밋·Metal GPU·ffmpeg를 한 번에 검사.
-- 실행: 터미널 `bash scripts/start_notebook.sh` → JupyterLab → `01_generate_music.ipynb` 열기 → 커널 **CTxAI · Stable Audio 3 MLX** → 셀1 실행 (≈5초). 출력 JSON(mlx 버전, device, weights_revision)을 가리키며 버전 기록이 재현의 전제라고 설명.
-- 자료: 셀1 출력 캡처(백업용).
+### S18. 환경 준비 — 노트북 첫 두 셀
+- 핵심: 모든 노트북은 「0. 준비」 셀부터. 저장소를 받고 모델 가중치를 받을 `models` 폴더 하나를 정한다. `KEEP_IN_DRIVE`를 켜면 Google Drive의 `CT-AI_Microdegree/models`에 받아 다음 실행 때 다시 받지 않는다.
+- 실행: `colab/README.md`의 링크로 06 열기 → 런타임은 기본 CPU 그대로 → 「0. 준비」 → 「설치와 모델 준비」(약 1분, 처음이면 내려받기 2~3분 추가. `MODEL='medium'`). 출력 줄 `LiteRT … · 모델 medium + same-l · CPU 스레드 2`를 가리키며 버전 기록이 재현의 전제라고 설명.
+- 같은 방법으로 07과 01도 탭을 열어 첫 두 셀을 실행해 둔다. Colab은 노트북마다 런타임이 따로라서, `KEEP_IN_DRIVE`를 켜지 않으면 07에서 같은 가중치를 다시 받는다.
+- 자료: 「설치와 모델 준비」 출력 캡처(백업용).
 
-### S19. 실습 A-1 — 프롬프트 쓰기 (NB01 셀3)
+### S19. 실습 A-1 — 프롬프트 쓰기 (06 「프롬프트와 설정」)
 - 핵심: 좋은 프롬프트 = 악기 + 템포(BPM) + 분위기 + 믹스 지시 + 금지("no vocals"). 기본 프롬프트(felt piano arpeggios, analog pads, 75 BPM, cinematic ambient…)를 한 구절씩 읽으며 설명.
 - 공식 프롬프트 가이드 팁(`stable-audio-3/docs/guides/prompting.md`): 장르·악기·분위기·BPM 네 요소를 넣는다. 학습 데이터(Freesound, AudioSparx) 태그 형식 `TrackType: Music, VocalType: Instrumental`을 앞에 붙이면 품질·일관성이 올라가고, 솔로 악기는 `TrackType: Instrument`로 시작. 모델은 알아들을 수 있는 가사를 내지 못한다(보컬 비슷한 질감만).
-- 실행: 셀3 값 확인. 수강생 제안 1개로 `PROMPT` 한 구절만 교체(예: 75 BPM → 120 BPM). `SECONDS=30, SEED=42, STEPS=8, CFG_VALUES=[1,2,4,6]` 유지.
+- 실행: 셀 값 확인. 수강생 제안 1개로 `PROMPT` 한 구절만 교체(예: 75 BPM → 120 BPM). `SECONDS=20, SEED=42, STEPS=8, CFG_VALUES=[1.0, 4.0]` 유지. `[1.0, 2.0, 4.0, 6.0]`은 약 4분이라 과제로 돌린다.
+- 메모: `NEGATIVE_PROMPT`는 CFG 1에서 쓸 수 없다. 쓰려면 `CFG_VALUES`에서 1을 빼야 하고, 빼지 않으면 노트북이 오류를 낸다.
 - 확인 포인트: BPM 숫자를 모델이 실제로 따르는지 다음 슬라이드에서 확인.
 
-### S20. 실습 A-2 — 같은 글, 같은 seed, CFG만 다르게 (NB01 셀4)
-- 핵심: CFG는 프롬프트 반영 강도. 네 번 순차 생성, 각 실행 폴더에 `run.json`이 남는다.
-- 실행: 셀4 `generate_cfg_sweep(...)` (30초×4개 ≈ 45~60초. CFG>1은 조건부·무조건부 두 번 계산이라 더 느림). 기다리는 동안 `inference.log`가 셀에 흘러나오는 것을 보여주며 별도 프로세스로 실행되고 종료 시 메모리를 반환한다고 설명.
-- 백업: 미리 돌린 `outputs/<시각>_cfg_sweep_*/` 폴더 또는 `reports/01_generate_music.executed.ipynb`(오디오 포함 29 MB)를 열어둔다.
+### S20. 실습 A-2 — 같은 글, 같은 seed, CFG만 다르게 (06 「생성: CFG 값마다 한 곡씩 차례로」)
+- 핵심: CFG는 프롬프트 반영 강도. 두 번 순차 생성, 실행마다 폴더에 `run.json`·`inference.log`가 남고 전체 설정은 `sweep.json`에 남는다.
+- 실행: `sa3.generate_cfg_sweep(...)` (20초 × 2개: CFG 1 약 45초 + CFG 4 약 65초 ≈ 2분. CFG>1은 조건부·무조건부 두 번 계산이라 더 느림). 기다리는 동안 셀에 찍히는 step 진행을 보여주며 추론이 별도 프로세스로 실행된다고 설명.
+- 백업: 수업 전에 실행해 둔 결과 zip(「저장: 결과 폴더를 zip으로 내려받기」 셀) 또는 출력이 남은 노트북 사본.
 
-### S21. 실습 A-3 — 멜 스펙트로그램 4장 + 플레이어 (NB01 셀6, 선택 셀8)
-- 핵심: 같은 색 범위(-90~-10 dB), 같은 축으로 비교. 밝기 차이는 음량 차이일 수 있음(플레이어 밑 RMS/Peak 숫자). CFG 6에서 왜곡·클리핑이 들리는지 확인.
-- 실행: 셀6 `compare_audio(...)` (≈3초) → PNG/HTML/JSON 저장. 시간 남으면 셀8 `RUN_CROP_COMPARISON=True, CROP_RANGE=(5,15)`로 같은 10초만 확대.
-- 정리(판서): CFG 1 = 보수적 / 2~4 = 프롬프트에 근접 / 6 = 왜곡·음량 증가. 기본 권장 범위 1~4.
+### S21. 실습 A-3 — 멜 스펙트로그램 + 플레이어 (06 「비교: 스펙트로그램과 플레이어」, 선택 「같은 구간 확대 비교」)
+- 핵심: 같은 색 범위(-90~-10 dB), 같은 축으로 비교. 밝기 차이는 음량 차이일 수 있음(플레이어 위 RMS/Peak 숫자). CFG 4에서 음량이 커지거나 거칠어지는지 확인.
+- 실행: `sa3.compare_audio(...)` → `cfg_comparison` PNG/HTML/JSON 저장. 시간 남으면 「같은 구간 확대 비교」(`CROP_RANGE=(5.0, 15.0)`)로 같은 10초만 확대.
+- 정리(판서): CFG 1 = 보수적 / 4 = 프롬프트에 근접, 음량 증가 / 6 이상 = 왜곡·클리핑 늘어남(Mac 검증 기록). 기본 권장 범위 1~4.
 
-### S22. 실습 B-1 — 원곡 만들기 또는 가져오기 (NB02 셀3·4)
-- 핵심: 인페인팅은 지정 구간만 재생성하고 바깥은 문맥으로 쓴다. 먼저 24초 잔잔한 피아노를 생성(`SOURCE_PROMPT`, seed 72) 하거나 `SOURCE_PATH`에 본인 파일.
-- 실행: `02_inpaint_music.ipynb` 열기 → 셀1(≈5초) → 셀3 설정 읽기(`START=6, END=18, TARGET_STYLE="orchestral_ensemble", CFG=4, SEED=73, NEGATIVE_PROMPT=...`) → 셀4 (24초 생성 ≈ 6~8초) → 파형 그림의 주황 구간 = 편집 범위.
-- 메모: `NEGATIVE_PROMPT`의 "gentle solo piano…"는 원곡 성격을 억제하기 위한 것. CFG 1에서는 무시되므로 4를 쓴다.
+### S22. 실습 B-1 — 원곡 만들기 또는 가져오기 (07 「원본과 목표 스타일」)
+- 핵심: 인페인팅은 지정 구간만 재생성하고 바깥은 문맥으로 쓴다. 원곡은 `SOURCE`로 고른다: 24초 잔잔한 피아노 생성(`SOURCE_PROMPT`, seed 72, 약 40초) / 예시(재즈 Vibe Ace, 앞 24초) / 업로드.
+- 실행: 07 탭에서 「원본과 목표 스타일」 설정 읽기(`START_SECONDS=6.0, END_SECONDS=18.0, TARGET_STYLE='orchestral_ensemble', CFG=4.0, SEED=73, NEGATIVE_PROMPT=...`) → 실행 → 파형 그림의 주황 구간 = 편집 범위.
+- 메모: `NEGATIVE_PROMPT`의 "gentle solo piano…"는 원곡 성격을 억제하기 위한 것. CFG 1에서는 쓸 수 없으므로 4를 쓴다. 입력은 앞 24초만 쓴다(`MAX_INPUT_SECONDS=24`, CPU 시간 절약).
 
-### S23. 실습 B-2 — 6~18초만 오케스트라로 (NB02 셀6)
-- 핵심: 하나의 함수 호출로 ① ffmpeg 변환(44.1 kHz 스테레오 PCM16) ② 모델 인페인팅 ③ 구간만 잘라 원곡에 합성(0.1초 크로스페이드) ④ `edit_report.json`.
-- 실행: 셀6 `inpaint(...)` (24초 입력 ≈ 8~10초). 출력 JSON의 `outside_region_bit_exact: true`, `edited_region_changed: true` 가리키기.
+### S23. 실습 B-2 — 6~18초만 오케스트라로 (07 「인페인팅 실행」)
+- 핵심: `sa3.inpaint(...)` 한 번의 호출로 ① 입력을 44.1 kHz 스테레오 PCM16 기준 파일로 변환 ② 모델 인페인팅 ③ 구간만 잘라 기준 파일에 합성(0.1초 크로스페이드) ④ `edit_report.json`.
+- 실행: 24초 입력 약 65초. 출력 JSON의 `outside_region_bit_exact: true`, `edited_region_changed: true` 가리키기.
 - 공식 가이드: 구간이 짧으면 문맥이 강해 원곡과 거의 같게 나오므로 처음엔 넓게 마스킹하고 줄여 간다. 프롬프트는 주변 문맥과 이어지는 내용이 성공률이 높다.
-- 변주(시간이 되면): `TARGET_STYLE="drum_and_bass"`로 한 번 더 실행하면 리듬 밀도 차이가 스펙트로그램에 드러남. `CFG=6`이면 변화와 함께 음량·왜곡도 커짐.
+- 변주(시간이 되면): `TARGET_STYLE='drum_and_bass'`로 「원본과 목표 스타일」부터 다시 실행하면 리듬 밀도 차이가 스펙트로그램에 드러남. `CFG = 6.0`이면 변화와 함께 음량·왜곡도 커짐.
 
-### S24. 실습 B-3 — 전후 비교와 보존 검증 (NB02 셀8·10·12)
+### S24. 실습 B-3 — 전후 비교와 보존 검증 (07 「전체 곡 비교」·「편집 구간만 확대 비교」·「검증」)
 - 핵심: 전체 비교(청록 점선 = 편집 경계) → 구간만 확대 비교 → assert로 구간 밖 샘플이 동일함을 확인. 편집 결과에 검증 코드를 함께 둔다.
-- 실행: 셀8(≈2초) → 셀10(≈2초) → 셀12 `PASS: 구간 밖 완전 보존, 구간 안 실제 변경.`
-- 산출물: `inpaint_full_comparison.html`(오디오 내장, 브라우저로 공유 가능) 열어 보여주기.
+- 실행: 「전체 곡 비교: 청록 점선이 편집 경계」 → 「편집 구간만 확대 비교」 → 「검증: 구간 밖은 그대로, 구간 안은 바뀌었는지」 출력 `PASS: 구간 밖 완전 보존, 구간 안 실제 변경.`
+- 산출물: `inpaint_full_comparison.html`(오디오 내장, 브라우저로 공유 가능). 「저장」 셀이 결과 폴더를 zip으로 내려받는다.
 
 ### S25. 실습 C — 오디오→오디오 변형 + 수강생 음원
-- 핵심: 인페인팅은 구간, 변형은 전체. `noise_level`이 원곡에서 얼마나 멀어질지를 정함. 공식 가이드: 노이즈를 올릴수록 멜로디·리듬 같은 저수준 특징부터 지워지고 음색·조성 같은 고수준 특징만 남는다. 예: 바이올린 솔로 → "Heavy metal guitar" 0.4(음은 유지, 악기만 교체), 트랜스 → 컨트리 0.6(스타일 교체).
-- 실행: NB01 셀10 `RUN_VARIATION=True` → `variation(cfg_clips[0][1], "warm jazz trio…", noise_level=0.6, seed=45)` (30초 ≈ 10초). 가능하면 `noise_level=0.3`으로 한 번 더 돌려 A/B.
-- 수강생 음원: 미리 받은 30초 이내 파일을 `model/inputs/`에 넣고 NB02 셀3 `SOURCE_PATH=str(MODEL_DIR/"inputs"/"xxx.wav")`, `START/END`를 그 곡 길이 안으로 → 셀4·6·8 재실행. (380초 초과 파일은 거부되므로 사전에 자른다.)
+- 핵심: 인페인팅은 구간, 변형은 전체. `NOISE_LEVEL`이 원곡에서 얼마나 멀어질지를 정함. 공식 가이드: 노이즈를 올릴수록 멜로디·리듬 같은 저수준 특징부터 지워지고 음색·조성 같은 고수준 특징만 남는다. 예: 바이올린 솔로 → "Heavy metal guitar" 0.4(음은 유지, 악기만 교체), 트랜스 → 컨트리 0.6(스타일 교체).
+- 실행: 07 「오디오 → 오디오 변형 (곡 전체)」에서 `RUN_VARIATION=True` 체크 → 인페인팅에 쓴 24초 원곡을 `VARIATION_PROMPT`("Instrumental warm jazz trio…"), `NOISE_LEVEL=0.6`, seed 45로 변형 (약 43초). 가능하면 `NOISE_LEVEL=0.3`으로 한 번 더 돌려 A/B.
+- 수강생 음원: 07 「원본과 목표 스타일」에서 `SOURCE='업로드'` → 파일 선택 → `START_SECONDS/END_SECONDS`를 24초 안으로 → 「인페인팅 실행」부터 다시. 앞 24초만 쓰므로 긴 파일도 미리 자를 필요가 없다.
 
-### S26. 실습 D-1 — 실시간 피아노 채보 라이브 (서버 CPU)
-- 핵심: 분석 모델은 명령 한 줄과 결과 파일. 30초 클립을 온라인 모드로 돌려 8초 안에 끝나는 것을 보여준다.
-- 실행(서버 터미널, Mac에서 ssh 화면 공유):
-  ```bash
-  cd piano/tools && CUDA_VISIBLE_DEVICES="" ~/anaconda3/envs/piano_rt/bin/python run_piano_amt.py ../songs/scarlatti_sonata_k455_maestro2017.flac --max_seconds 30 --threads 4 --ref_midi ../songs/scarlatti_sonata_k455_maestro2017.midi --out_dir /tmp/class_amt
-  ```
-  (≈ 8초) → `amt_timing.json`의 `onset_f1`, `end_to_end_latency_estimate_ms` 읽기 → `amt_roll.png` 열기.
-- 변주: `--no-delay-compensation` 붙여 다시 → onset F1이 0.99에서 0.2대로 떨어지는 것 확인 (S7의 지연 보정 설명과 연결).
-- 백업: `piano/outputs/scarlatti_sonata_k455_maestro2017/amt_timing.json`, `amt_roll.png` 사전 캡처.
+### S26. 실습 D-1 — 실시간 피아노 채보 (01, CPU)
+- 핵심: 분석 모델도 셀 몇 개로 돌린다. 32 ms 조각을 하나씩 넣는 실시간 루프를 CPU로 시뮬레이션해, 30초 곡이 약 10초에 끝나는 것을 보여준다.
+- 실행: 01 탭에서 「오디오 준비」(예시 = 스카를라티 K.455 30초) → 「모델 로드」(체크포인트 179 MB, 처음 한 번) → 「추론: 32 ms 청크로 실시간 루프 시뮬레이션」 출력의 실시간 배속·청크당 처리 시간 읽기 → 「정답과 비교」 onset F1 보정 전 0.28 / 보정 후 0.99 → 「듣기·보기」 피아노롤(파랑 = 모델, 노랑 = 정답).
+- 변주: 「지연 보정 전/후 비교 재생」 — 왼쪽 원음, 오른쪽 합성음. 보정 전은 0.2초 늦게 따라오는 것이 들린다 (S7의 지연 보정 설명과 연결).
+- 백업: 리포트 `#s1`, 서버 사전 결과 `piano/outputs/scarlatti_sonata_k455_maestro2017/amt_timing.json`, `amt_roll.png` 캡처.
 
-### S27. 실습 D-2 — 밴드 분석 JSON 열기 (사전 실행 결과)
+### S27. 실습 D-2 — 밴드 분석 JSON 열기 (사전 실행 결과, 강사 화면)
 - 핵심: Demucs·YourMT3+·allin1은 CPU로 곡당 3~10분이라 수업 중엔 돌리지 않고, 통합 결과 `analysis.json`을 파이썬 몇 줄로 읽어 비주얼용 값을 꺼낸다.
-- 실행(서버, 어떤 파이썬이든):
+- 실행(강사 화면, 연구실 서버의 사전 실행 결과):
   ```python
   import json; d = json.load(open('band/outputs/02_hello/analysis.json'))
   print(d['tempo']['bpm'], len(d['tempo']['beats']), d['tempo']['downbeats'][:4])
@@ -279,10 +279,10 @@
   ```
   → 출력 예(실측): BPM 128, 비트 476개, 구조 intro→verse→inst→verse→chorus→solo→chorus→outro.
 - 자료: 리포트 `#s4`(스템 체크박스)와 `#s6`(클릭 재생)를 옆에 띄워 숫자와 그래프를 대응시킨다.
-- 메모: 스템 청취는 `docs/audio/hello_stems/*.mp3`로 바로 가능. `structure_map.png` 한 장으로 마무리.
+- 메모: 스템 청취는 `docs/audio/hello_stems/*.mp3`로 바로 가능. `structure_map.png` 한 장으로 마무리. 같은 분석을 직접 해 보려면 저장소 노트북 02(YourMT3+)·03(allin1)·04(Demucs). T4 GPU 권장이라 수업 후 과제로 안내.
 
 ### S28. 실습 D-3 — 분석 모델 설정값 요약 (명령줄)
-- 핵심: 오늘 실행하지 않은 세 모델의 주요 설정값을 한 표로 (3-3, 3-4, 3-5의 설정값 항목). 개인 실행용 참고.
+- 핵심: 오늘 실행하지 않은 세 모델의 주요 설정값을 한 표로 (3-3, 3-4, 3-5의 설정값 항목). 개인 실행용 참고. Colab에서는 노트북 02~04로 같은 모델을 돌릴 수 있다.
   ```bash
   # Demucs: 보컬/반주 2스템, CPU
   demucs -n htdemucs --two-stems vocals -d cpu song.wav
@@ -296,44 +296,42 @@
 - 핵심: S14 표의 "올리면/내리면" 열을 수업 중 청취 결과로 다시 채운다. 수강생이 말한 표현을 그대로 적는다.
 
 ### S30. 이후 과제 + 자료 링크
-- 핵심: ① Tone Transfer로 녹음 → 악기 변환 ② HF Space `stabilityai/stable-audio-3`로 프롬프트 연습 ③ Apple Silicon이면 배포 ZIP 설치(`bash scripts/setup.sh`) ④ 리포트 HTML을 열어 섹션별 소리와 값 다시 보기.
-- 링크: Stable Audio 3 GitHub/HF, Tone Transfer, 리포트 standalone HTML(배포본), 이 계획서.
+- 핵심: ① Tone Transfer로 녹음 → 악기 변환 (또는 노트북 05) ② 06에서 `CFG_VALUES=[1.0, 2.0, 4.0, 6.0]`, 07에서 다른 `TARGET_STYLE`로 다시 실행 ③ 노트북 02~04로 자기 음원 분석 (T4 GPU 권장) ④ 리포트 HTML을 열어 섹션별 소리와 값 다시 보기.
+- 링크: 실습 저장소 github.com/dabinkim0/CT-AI_Microdegree, Stable Audio 3 GitHub/HF, HF Space `stabilityai/stable-audio-3`, Tone Transfer, 리포트 standalone HTML(배포본), 이 계획서.
 
 ---
 
 ## 6. 사전 준비 체크리스트
 
-### 6-1. 환경 (강사 Mac, 토요일 전날까지)
-- [ ] `model/` 폴더가 Mac에 있고 `.conda-env`가 살아 있는지: `bash scripts/start_notebook.sh`로 JupyterLab이 뜨고 커널 목록에 **CTxAI · Stable Audio 3 MLX**가 보이는지.
-- [ ] 가중치 4개 검증: `./.conda-env/bin/python scripts/prepare_weights.py --verify-only` (dit_medium_f16 2.9 GB, same_l_encoder/decoder 각 1.7 GB, t5gemma 0.57 GB. 합 6.88 GB).
-- [ ] 단위 테스트: `./.conda-env/bin/python -m unittest discover -s tests -v` (4개 통과 확인).
-- [ ] 두 노트북을 처음부터 끝까지 1회 실행해 시간 재기 (검증 기록: NB01 43.5초, NB02 24.6초). 그 출력 폴더를 **백업 결과**로 지정해 S20·S23에서 바로 열 수 있게 북마크.
-- [ ] `reports/01_generate_music.executed.ipynb`, `02_inpaint_music.executed.ipynb`(오디오 내장)도 JupyterLab에서 열리는지 확인 — 모델이 안 돌 때 최후 백업.
-- [ ] 저장 공간 15 GB 이상, 전원 연결, 다른 무거운 앱 종료(통합 메모리 18 GB 기준 피크 3.9 GiB).
-- [ ] 오프라인 모드(`HF_HUB_OFFLINE=1`)가 스크립트에 이미 설정되어 있으므로 강의장 인터넷 불필요. Tone Transfer만 인터넷 필요.
-- [ ] 이 서버의 `model.zip`(7.0 GB, 가중치·conda 환경 포함)은 Linux에서 실행 불가(MLX). 서버에는 참고용으로만 둔다.
+### 6-1. 노트북 (강사, 토요일 전날까지)
+- [ ] `colab/README.md`의 링크로 06·07·01을 Colab에서 열어, 「0. 준비」에서 `KEEP_IN_DRIVE`를 켜고 처음부터 끝까지 1회 실행. 가중치가 Drive `CT-AI_Microdegree/models`에 남는다(Stable Audio 3 약 3.2 GB + 첫 실행 때 만드는 CPU 캐시 약 2.3 GB, online AMT 약 180 MB). Drive 여유 6 GB 이상.
+- [ ] 셀별 시간 기록. 기준: 06 생성 CFG 1 약 45초 · CFG 4 약 65초, 07 피아노 생성 약 40초 · 인페인팅 약 65초 · 변형 약 43초, 01 30초 곡 채보 약 10초. 크게 다르면 4절 타임라인을 조정.
+- [ ] 06·07의 「저장」 셀로 결과 zip을 내려받아 **백업 결과**로 둔다(S20·S23에서 바로 열 수 있게). 출력이 남은 노트북 사본도 Drive에 저장 — 모델이 안 돌 때 최후 백업.
+- [ ] 01 「정답과 비교」가 보정 전 0.28 / 보정 후 0.99 근처로 나오는지 확인.
+- [ ] 강의장 인터넷 확인(Colab이므로 필수). 수강생 다수가 수업 중 처음 내려받으면 느려지므로 사전 실행 안내(6-5)를 금요일에 다시 보낸다.
 
 ### 6-2. 분석 모델 (연구실 Linux 서버, CPU만)
-- [ ] `piano_rt` env로 S26 명령을 미리 1회 실행해 `/tmp/class_amt`가 생기는지, 8초 내 끝나는지 확인. (`CUDA_VISIBLE_DEVICES=""` 고정.)
 - [ ] `band/outputs/02_hello/analysis.json`, `structure_map.png`, `docs/audio/hello_stems/*.mp3` 존재 확인(확인됨, 2026-10-19).
-- [ ] 강의장에서 서버 접속이 불안하면 S26·S27을 사전 캡처(터미널 출력 + PNG)로 대체.
+- [ ] S27 파이썬을 강사 화면에서 1회 실행해 출력 확인. 강의장에서 서버 접속이 불안하면 S27을 사전 캡처(출력 + PNG)로 대체.
 
 ### 6-3. 리포트 HTML
-- [ ] `docs/report_2026-10-06_standalone.html`(단일 파일)을 강사 Mac에 복사해 브라우저 북마크: `#s1, #s3, #s4, #s5, #s6, #s7`. 섹션 2(CHIME)는 스크롤로 지나치되 언급하지 않음.
+- [ ] `docs/report_2026-10-06_standalone.html`(단일 파일)을 강사 노트북에 복사해 브라우저 북마크: `#s1, #s3, #s4, #s5, #s6, #s7`. 섹션 2(CHIME)는 스크롤로 지나치되 언급하지 않음.
 - [ ] 각 섹션 ▶ 재생 버튼과 스템 체크박스(`#s4`)가 오프라인에서도 동작하는지 확인(오디오가 base64로 내장된 standalone 버전 권장).
 
 ### 6-4. 샘플 곡
 | 용도 | 파일 | 비고 |
 |---|---|---|
-| 인페인팅 기본 | 노트북이 생성(24초 피아노, seed 72) | 외부 파일 불필요 |
-| 인페인팅 실곡 예시 | `docs/audio/hello_60s.mp3` → `model/inputs/hello_30s.wav`로 30초 자르기 (`ffmpeg -i hello_60s.mp3 -t 30 -ar 44100 -ac 2 hello_30s.wav`) | 밴드 곡 20~32초를 오케스트라로 |
-| 변형 | NB01 CFG 1 결과(자동) | — |
-| 피아노 채보 라이브 | `piano/songs/scarlatti_sonata_k455_maestro2017.flac` + `.midi` | 정답 MIDI가 있어 F1이 바로 나옴 |
-| 수강생 음원 | 금요일까지 30초 이내 wav/mp3 수집 → `model/inputs/` | 380초 초과·저작권 민감 파일 제외 |
+| 인페인팅 기본 | 07이 생성(24초 피아노, seed 72) | 외부 파일 불필요 |
+| 인페인팅 실곡 예시 | 07 `SOURCE='예시 (재즈 Vibe Ace, 앞 24초)'` (`colab/audio/jazz_vibe_ace_60s.wav`) | CC 라이선스, 출처는 `colab/audio/LICENSES.md` |
+| 변형 | 07 인페인팅의 24초 원곡(자동) | — |
+| 피아노 채보 | 01 예시 `colab/audio/piano_scarlatti_k455_30s.wav` + `.mid` | 정답 MIDI가 있어 F1이 바로 나옴 |
+| 수강생 음원 | 금요일까지 30초 이내 wav/mp3 안내. 수업 때 07에서 각자 업로드 | 앞 24초만 쓰임. 저작권 민감 파일은 외부 배포 금지 |
 
-### 6-5. 수강생용 배포
-- [ ] `model/dist/CTxAI-Stable-Audio-3-Medium-MLX.zip`(코드·노트북·스크립트, 가중치 제외) 공유 링크. Apple Silicon + macOS 15 + 15 GB + 인터넷 필요. 설치: `bash scripts/setup.sh` → `bash scripts/start_notebook.sh`.
-- [ ] 비(非) Mac 수강생용 링크: HF Space `stabilityai/stable-audio-3`, Tone Transfer, 리포트 standalone HTML.
+### 6-5. 수강생 안내 (목요일 수업 후 + 금요일)
+- [ ] 저장소 링크 github.com/dabinkim0/CT-AI_Microdegree 와 `colab/README.md`의 Colab 링크(06·07·01). 필요: Google 계정, 브라우저, 헤드폰. 설치·GPU 불필요.
+- [ ] 수업 전에 06·07·01을 한 번씩 열어 끝까지 실행. 「0. 준비」에서 `KEEP_IN_DRIVE`를 켜면 가중치가 Drive에 남아 수업 때 다시 받지 않는다(Drive 여유 6 GB 이상). 켜지 않으면 런타임이 끝날 때 지워지고, 수업 중 06·07 각각 내려받기 2~3분이 다시 든다.
+- [ ] Drive 공간이 부족하면 06·07 「설치와 모델 준비」에서 `MODEL='sm-music'`(약 1.2 GB, 최대 120초).
+- [ ] Colab을 못 쓰는 수강생용 링크: HF Space `stabilityai/stable-audio-3`, Tone Transfer, 리포트 standalone HTML.
 
 ---
 
@@ -357,12 +355,13 @@
 
 | 상황 | 대안 |
 |---|---|
-| Mac에서 `No Metal device available` | 원격 세션·샌드박스가 아닌 로컬 터미널에서 실행. 안 되면 `reports/*.executed.ipynb`로 진행 |
-| 추론이 예상보다 느림(다른 Mac) | `SECONDS=15`, `CFG_VALUES=[1,4]`로 줄이면 A 블록이 약 1/4로 단축 |
-| 메모리 부족 | 길이 줄이기, CFG 1, 한 번에 하나. `--free-models`는 기본 켜짐 |
-| 서버 접속 불가 | S26·S27은 사전 캡처 + `piano/outputs/*`, `band/outputs/*` 복사본을 Mac에 가져가 열기 |
+| Colab 연결 끊김·런타임 초기화 | `KEEP_IN_DRIVE`를 켰다면 「0. 준비」부터 다시 실행해도 내려받기 없음. 아니면 강사 화면과 백업 zip으로 진행 |
+| 수강생이 사전 실행을 안 함 | 수업 시작과 동시에 06·07·01의 첫 두 셀을 실행하게 하고, 내려받는 동안 강사 화면으로 진행 |
+| 추론이 예상보다 느림 | 06 `SECONDS`를 10~15로 줄이기, 06·07 「설치와 모델 준비」에서 `MODEL='sm-music'` |
+| Drive 공간 부족 (6 GB 미만) | `KEEP_IN_DRIVE`를 끄고 `/content` 사용(런타임마다 다시 받음) 또는 `sm-music` |
+| 서버 접속 불가 | S27은 사전 캡처 + `band/outputs/*` 복사본을 강사 노트북에 가져가 열기 |
 | Tone Transfer 사이트 변경/접속 불가 | 사전 녹화 30초 영상 1개 준비 |
-| 수강생 음원이 길거나 포맷 문제 | ffmpeg로 30초 자르기 명령을 S25에 준비. 변환 실패 시 노트북 기본 피아노 예제로 진행 |
+| 수강생 음원이 길거나 포맷 문제 | 07은 앞 24초만 쓰므로 길이는 문제없음. 읽기 실패 시 `SOURCE`를 피아노 생성이나 예시로 바꿔 진행 |
 | 시간 초과 | 4절·1절의 자르는 순서대로 |
 
 ## 9. 참고 링크
